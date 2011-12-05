@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>BNF for parser.jj</TITLE>
+</HEAD>
+<BODY>
+<H1 ALIGN=CENTER>BNF for JBrackets</H1>
+<H2 ALIGN=CENTER>TOKENS</H2>
+<TABLE>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;#SPACE: [" ","\n","\r","\t"]&gt;
+| &lt;#BR_LFT: "{%" (&lt;SPACE&gt;)*&gt;
+| &lt;EXP_LFT: "{{"&gt; : EXP
+| &lt;TAG_BLOCK: &lt;BR_LFT&gt; "block"&gt; : PARAM
+| &lt;TAG_ENDBLOCK: &lt;BR_LFT&gt; "endblock"&gt; : PARAM
+| &lt;TAG_EXTENDS: &lt;BR_LFT&gt; "extends"&gt; : PARAM
+| &lt;TAG_FOR: &lt;BR_LFT&gt; "for"&gt; : PARAM
+| &lt;TAG_ENDFOR: &lt;BR_LFT&gt; "endfor" &lt;END_BR&gt;&gt;
+| &lt;TAG_IF: &lt;BR_LFT&gt; "if"&gt; : PARAM
+| &lt;TAG_ELSE: &lt;BR_LFT&gt; "else" &lt;END_BR&gt;&gt;
+| &lt;TAG_ENDIF: &lt;BR_LFT&gt; "endif" &lt;END_BR&gt;&gt;
+| &lt;TAG_INCLUDE: &lt;BR_LFT&gt; "include"&gt; : PARAM
+| &lt;TAG_COMMENT_START: "{#"&gt;
+| &lt;TAG_COMMENT_END: "#}"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;EXP&gt; TOKEN : {
+&lt;EXP_RGH: (&lt;SPACE&gt;)* "}}"&gt; : DEFAULT
+| &lt;FILTER: "|"&gt;
+| &lt;DELIM: ":"&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT,PARAM,EXP&gt; TOKEN : {
+&lt;CHARACTER: ["\u0000"-"\ufffe"]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;PARAM&gt; TOKEN : {
+&lt;END_BR: (&lt;SPACE&gt;)* "%}"&gt; : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+</TABLE>
+<H2 ALIGN=CENTER>NON-TERMINALS</H2>
+<TABLE>
+ <!-- Special token -->
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod1">process</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod2">extends_tag</A> )? <A HREF="#prod3">body</A> &lt;EOF&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod2">extends_tag</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;TAG_EXTENDS&gt; <A HREF="#prod4">tag_param</A> &lt;END_BR&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod3">body</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod5">block_comment</A> | &lt;CHARACTER&gt; | <A HREF="#prod6">expr</A> | <A HREF="#prod7">block_tag</A> | <A HREF="#prod8">for_tag</A> | <A HREF="#prod9">if_tag</A> | <A HREF="#prod10">include_tag</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod5">block_comment</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;TAG_COMMENT_START&gt; ( &lt;CHARACTER&gt; )* &lt;TAG_COMMENT_END&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod7">block_tag</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;TAG_BLOCK&gt; <A HREF="#prod4">tag_param</A> &lt;END_BR&gt; <A HREF="#prod3">body</A> &lt;TAG_ENDBLOCK&gt; <A HREF="#prod11">opt_tag_param</A> &lt;END_BR&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">for_tag</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;TAG_FOR&gt; <A HREF="#prod4">tag_param</A> &lt;END_BR&gt; <A HREF="#prod3">body</A> &lt;TAG_ENDFOR&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod10">include_tag</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;TAG_INCLUDE&gt; <A HREF="#prod4">tag_param</A> &lt;END_BR&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod9">if_tag</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;TAG_IF&gt; <A HREF="#prod4">tag_param</A> &lt;END_BR&gt; <A HREF="#prod3">body</A> &lt;TAG_ELSE&gt; <A HREF="#prod3">body</A> &lt;TAG_ENDIF&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod12">processFilter</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">expr</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;EXP_LFT&gt; ( &lt;CHARACTER&gt; | &lt;FILTER&gt; | &lt;DELIM&gt; )+ &lt;EXP_RGH&gt;</TD>
+</TR>
+ <!-- Special token -->
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">tag_param</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;CHARACTER&gt; )+</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">opt_tag_param</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;CHARACTER&gt; )*</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>
