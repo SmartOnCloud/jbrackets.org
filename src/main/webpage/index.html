@@ -27,7 +27,7 @@
 				<ul class="nav">
 					<li><a href="#">{{ Home }}</a></li>
 					<li><a href="#">{{ Documentation }}</a></li>
-					<li><a href="#">{{ Download }}</a></li>
+					<li><a href="https://r.tasktop.com/s/jbrackets.org/hudson/job/Deploy/lastSuccessfulBuild/artifact/target/jbrackets-1.0.0.BUILD-SNAPSHOT.jar">{{ Download }}</a></li>
 					<li><a href="https://github.com/SmartOnCloud/jbrackets.org">{{ Source }}</a></li>
 				</ul>
 			</div>
@@ -78,7 +78,16 @@
   &lt;groupId&gt;org.jbrackets&lt;/groupId&gt;
   &lt;artifactId&gt;jbrackets&lt;/artifactId&gt;
   &lt;version&gt;1.0.0.BUILD-SNAPSHOT&lt;/version&gt;
-&lt;/dependency&gt;</pre>
+&lt;/dependency&gt;
+</pre>
+			Add maven repository:
+			<pre class="prettyprint lang-xml">
+&lt;repository&gt;
+  &lt;id&gt;jbrackets.org&lt;/id&gt;
+  &lt;name&gt;jbracket.org repository&lt;/name&gt;
+  &lt;url&gt;https://r.tasktop.com/s/jbrackets.org/maven/&lt;/url&gt;
+&lt;/repository&gt;
+</pre>
 			Configure Spring View Resolver:
 			<pre class="prettyprint lang-xml">
 &lt;bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"&gt;
@@ -198,7 +207,7 @@
 				inheritance allows you to build a base "skeleton" template that
 				contains all the common elements of your site and defines blocks
 				that child templates can override. It's easiest to understand
-				template inheritance by starting with an example:</p>
+				template inheritance by showing an example:</p>
 			<pre class="prettyprint lang-java">
 base.html
 ---------
