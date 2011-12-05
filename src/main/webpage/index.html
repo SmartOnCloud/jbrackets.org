@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<meta name="Keywords"
+	content="FreeMarker, template, templates, HTML, HTML template, page template, text, macro, macros, preprocessor, MVC, view, servlet, Java, free, open source, spring">
+<meta name="Description"
+	content="Java template engine; a generic tool to generate text output. Practical for servlet-based Web applications following the MVC pattern. Free. Integration with spring mvc.">
+
+<title>JBrackets.org</title>
+<link rel="shortcut icon" type="image/png" href="static/icon.png">
+<link href="static/prettify/prettify.css" type="text/css"
+	rel="stylesheet" />
+<script type="text/javascript" src="static/prettify/prettify.js"></script>
+<link href="static/style.css" media="screen" rel="stylesheet"
+	type="text/css" />
+
+</head>
+<body onload="prettyPrint()">
+	<div data-dropdown="dropdown" class="topbar">
+		<div class="topbar-inner">
+			<div class="container">
+				<h3>
+					<a href="#">{{ jbrackets }}</a>
+				</h3>
+				<ul class="nav">
+					<li class="active"><a href="#">{{ Home }}</a></li>
+					<li><a href="#">{{ Documentation }}</a></li>
+					<li><a href="#">{{ Download }}</a></li>
+					<li><a href="#">{{ Source }}</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		<div class="sidebar">
+			<div class="alert-message block-message alert">
+				<h1>
+					<small>Navigation</small>
+				</h1>
+				<dl>
+					<dt>Documentation
+					<dd>Usage
+					<dd>Tag List
+					<dd>Template Inheritance
+					<dd>Expression Evaluation
+					<dt>Resources
+					<dd><a href="http://springframework.org">Spring Framework</a>
+					<dd><a href="http://docs.codehaus.org/display/JANINO/Home">Janino Java Compiler</a>
+					<dd><a href="http://javacc.java.net/">JavaCC</a>
+					<dt><a href="#team">Project Team</a>
+					<dt><a href="#license">License</a>
+				</dl>
+			</div>
+		</div>
+
+		<div class="content">
+			<iframe
+				src="static/github/github-btn.html?user=smartoncloud&amp;repo=jbrackets.org&amp;type=watch&amp;count=true&amp;size=large"
+				allowtransparency="true" frameborder="0" scrolling="0" width="170px"
+				height="30px"></iframe>
+
+			<br /> <br />
+			<h1>Meet JBrackets</h1>
+			<div class="alert-message block-message success">
+				<p>{{ JBrackets }} is a Java-based template engine inspired by
+					django templates. It permits anyone to use a simple yet powerful
+					template language to reference objects defined in Java code. It
+					integrates well with spring-webmvc</p>
+			</div>
+
+			<h1>Usage</h1>
+			Include dependency in your project:
+			<pre class="prettyprint lang-xml">
+&lt;dependency&gt;
+  &lt;groupId&gt;org.jbrackets&lt;/groupId&gt;
+  &lt;artifactId&gt;jbrackets&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0.BUILD-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+			Configure Spring View Resolver:
+			<pre class="prettyprint lang-xml">
+&lt;bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"&gt;
+  &lt;property name="prefix" value="/WEB-INF/views/" /&gt;
+  &lt;property name="suffix" value=".html" /&gt;
+  &lt;property name="contentType" value="text/html;charset=UTF8" /&gt;
+  &lt;property name="viewClass" value="org.jbrackets.web.TemplateView" /&gt;
+&lt;/bean&gt;
+</pre>
+			<h1>Tag list</h1>
+
+			<h1>
+				<code>Extends</code>
+			</h1>
+			Signals that this template extends a parent template. Example:
+			<pre class="prettyprint lang-xml">{% extends base.html %}</pre>
+			uses the literal value "base.html" as the name of the parent template
+			to extend. See <a href="#template-inheritance">Template
+				inheritance</a> for more information.
+
+			<h1>
+				<code>Block</code>
+			</h1>
+			Defines a block that can be overridden by child templates. See
+			Template inheritance for more information.
+			<pre class="prettyprint lang-xml">{% block content %} some content {% endblock %}</pre>
+
+			<h1>
+				<code>Comments</code>
+			</h1>
+			Ignores everything between {# and #}
+			<pre class="prettyprint lang-xml">{# this is ignored #}</pre>
+
+
+			<h1>
+				<code>Include</code>
+			</h1>
+			Loads a template and renders it with the current context. This is a
+			way of "including" other templates within a template. The template
+			name can either be a variable or a hard-coded (quoted) string, in
+			either single or double quotes. This example includes the contents of
+			the template "foo/bar.html":
+			<pre class="prettyprint lang-xml">{% include foo/bar.html %}</pre>
+
+
+
+			<h1>
+				<code>For</code>
+			</h1>
+			Loop over each item in an array. For example, to display a list of
+			athletes provided in athlete_list:
+			<pre class="prettyprint lang-xml">{% for athlete in athlete_list %}
+    {{ athlete.name }}
+{% endfor %}</pre>
+			The for loop sets a number of variables available within the loop:
+			<table class="
+      condensed-table bordered-table zebra-striped">
+				<thead>
+					<tr>
+						<th>Variable</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>forloop.counter</td>
+						<td>The current iteration of the loop (1-indexed)</td>
+					</tr>
+					<tr>
+						<td>forloop.counter0</td>
+						<td>The current iteration of the loop (0-indexed)</td>
+					</tr>
+					<tr>
+						<td>forloop.revcounter</td>
+						<td>The number of iterations from the end of the loop
+							(1-indexed)</td>
+					</tr>
+					<tr>
+						<td>forloop.revcounter0</td>
+						<td>The number of iterations from the end of the loop
+							(0-indexed)</td>
+					</tr>
+					<tr>
+						<td>forloop.first</td>
+						<td>True if this is the first time through the loop</td>
+					</tr>
+					<tr>
+						<td>forloop.last</td>
+						<td>True if this is the last time through the loop</td>
+					</tr>
+					<tr>
+						<td>forloop.parentloop</td>
+						<td>For nested loops, this is the loop "above" the current
+							one</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<h1>
+				<code>If</code>
+			</h1>
+			<p>The if tag evaluates a variable, and if that variable is
+				"true" (i.e. exists, is not empty, and is not a false boolean value)
+				the contents of the block are output:</p>
+			<pre class="prettyprint lang-java">
+{% if athlete_list %}
+    Number of athletes: {{ athlete_list.size() }}
+{% else %}
+    No athletes.
+{% endif %}
+</pre>
+
+
+			<h2 id="template-inheritance">Template Inheritance</h2>
+			<p>The most powerful -- and thus the most complex -- part of
+				JBrackets's template engine is template inheritance. Template
+				inheritance allows you to build a base "skeleton" template that
+				contains all the common elements of your site and defines blocks
+				that child templates can override. It's easiest to understand
+				template inheritance by starting with an example:</p>
+			<pre class="prettyprint lang-java">
+base.html
+---------
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;{% block title %}Base Title{% endblock %}&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    {% block content %}Base Content{% endblock %}
+  &lt;/body&gt;
+&lt;/html&gt;
+  
+index.html
+----------
+{% extends base.html %}
+{% block title %}Index title{% endblock %}
+{% block content %}
+Index Content
+{% endblock %}</pre>
+			<h1>Expression evaluation</h1>
+			<p>
+				{{ JBrackets }} relies on <a
+					href="http://static.springsource.org/spring/docs/current/spring-framework-reference/htmlsingle/spring-framework-reference.html#expressions">Spring
+					Expression Language</a>. The Spring Expression Language (SpEL for
+				short) is a powerful expression language that supports querying and
+				manipulating an object graph at runtime. The language syntax is
+				similar to Unified EL but offers additional features, most notably
+				method invocation and basic string templating functionality.
+			</p>
+			<h1 id="team">Project Team</h1>
+			<ul class="media-grid">
+				<li><a href="https://twitter.com/#!/igormihalik"> <img class="thumbnail"
+						src="http://www.gravatar.com/avatar/1fa4e55c8071e060785e56d810ebb905"></a></li>
+				<li><a href="https://twitter.com/#!/michaljemala"> <img class="thumbnail"
+						src="http://www.gravatar.com/avatar/4a18e0b6c58eb2509b49653687ce2848"></a></li>
+			</ul>
+			<h2 id="license">License</h2><p>
+			Code is dsitributed under <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License.</a></p>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% extends parent.html %}
+%}
+	Igor MIhálik +ľščťžý <html>asd</html>
+	{% block test %}
+		asdas
+		{% block test2 %} nejake 
+		{% endblock test2 %} 
+		fo za blockom
+		
+{{   12 + 123 *2 }}
+
+{% for a in {1,2,3,4}%} {{ a }}
+{% endfor %}
+
+{% for job in jobs %}
+	{% block test3 %}
+		{% for job2 in jobs %}
+		 	{% if job.equals(job2) %}
+jobs are equal {{job}} vs {{job2}}
+		 	{% else %}
+jobs are not equal {{job}} vs {{job2}}
+		 	{% endif %}
+  			Some text inside "test" block
+		{% endfor %}
+	{% endblock %}
+{% endfor %}
+
+ 
+{% if true %}
+if block
+{% else %}
+else block
+{% endif %}
+{ zatvorka
+ and how are you?
+  
+{{ "some expression"|upper:"what ever" "asdas"|lower }}
+{{ new java.util.Date() }}
+\ads
+
+  {% endblock %}
