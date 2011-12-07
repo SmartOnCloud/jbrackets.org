@@ -1,7 +1,6 @@
 package org.jbrackets.parser.tokens;
 
-import static java.lang.String.format;
-
+import org.jbrackets.tags.IfTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +24,7 @@ public class IfToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return format(
-		"new IfTag(this).evaluate(\"%s\", %s.class, %s.class); \n",
-		expr, ifClassName, elseClassName);
+	return IfTag.generateInvocation(expr, ifClassName, elseClassName);
     }
 
     public BaseToken getIf() {
@@ -40,9 +37,9 @@ public class IfToken extends BaseToken {
 
     @Override
     public String getImplementation() {
-	return class_construct(ifClassName, "Block", true,
+	return class_construct(ifClassName, Block.class.getName(), true,
 		getTokens())
-		+ class_construct(elseClassName, "Block", true,
+		+ class_construct(elseClassName, Block.class.getName(), true,
 			elseBlock.getTokens());
     }
 }

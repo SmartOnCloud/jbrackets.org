@@ -43,7 +43,9 @@ public class TemplateEngine {
 
 	if (log.isDebugEnabled())
 	    startGen = new Date();
-	StringBuilder s = createOutputStringBuilder();
+	StringBuilder s = new StringBuilder();
+	s.append("// ----------------------------------------------------------------------------------------------------------------------\n");
+	s.append("// -----------------------------------GENERATED--------------------------------------------------------------------------\n");
 	File templateFile = new File(templateFileName);
 	String templateName = getClassNameFromTemplateName(templateFile
 		.getName());
@@ -65,14 +67,15 @@ public class TemplateEngine {
 	    StringWriter stringWriter = new StringWriter();
 	    newInstance.render(new PrintWriter(stringWriter), ctx);
 	    stringWriter.flush();
-	    if (log.isDebugEnabled())
+	    if (log.isDebugEnabled()) {
 		endExecution = new Date();
-	    log.debug("generation [ms]: "
-		    + (startCompile.getTime() - startGen.getTime()));
-	    log.debug("compilation[ms]: "
-		    + (endCompile.getTime() - startCompile.getTime()));
-	    log.debug("execution  [ms]: "
-		    + (endExecution.getTime() - endCompile.getTime()));
+		log.debug("generation [ms]: "
+			+ (startCompile.getTime() - startGen.getTime()));
+		log.debug("compilation[ms]: "
+			+ (endCompile.getTime() - startCompile.getTime()));
+		log.debug("execution  [ms]: "
+			+ (endExecution.getTime() - endCompile.getTime()));
+	    }
 	    return stringWriter.toString();
 	} catch (ClassNotFoundException e) {
 	    throw new RuntimeException(e);
@@ -123,15 +126,6 @@ public class TemplateEngine {
 	}
     }
 
-    private StringBuilder createOutputStringBuilder() {
-	StringBuilder s = new StringBuilder();
-	s.append("// ----------------------------------------------------------------------------------------------------------------------\n");
-	s.append("// -----------------------------------GENERATED--------------------------------------------------------------------------\n");
-	s.append("import ").append(Block.class.getName()).append(";\n");
-	s.append("import org.jbrackets.tags.*;\n");
-	return s;
-    }
-
     @SuppressWarnings("unchecked")
     private static Class<? extends Block> compile(String fileName, String src)
 	    throws ScanException, org.codehaus.janino.Parser.ParseException,
@@ -144,4 +138,3 @@ public class TemplateEngine {
 	return loadClass;
     }
 }
-

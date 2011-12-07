@@ -1,11 +1,12 @@
 package org.jbrackets.tags;
 
+import static java.lang.String.format;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jbrackets.parser.tokens.Block;
-
 
 public class ForEachTag extends Tag {
     private int counter = 1;
@@ -65,4 +66,9 @@ public class ForEachTag extends Tag {
 	this.parentloop = parentloop;
     }
 
+    public static String generateInvocation(String it, String col,
+	    String className) {
+	return format("new %s(this).iterate(\"%s\", \"%s\", %s.class);\n",
+		ForEachTag.class.getName(), it, col, className);
+    }
 }

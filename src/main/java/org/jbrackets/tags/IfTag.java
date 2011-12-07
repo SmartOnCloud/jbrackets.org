@@ -1,9 +1,10 @@
 package org.jbrackets.tags;
 
+import static java.lang.String.format;
+
 import java.util.HashMap;
 
 import org.jbrackets.parser.tokens.Block;
-
 
 public class IfTag extends Tag {
 
@@ -23,5 +24,12 @@ public class IfTag extends Tag {
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}
+    }
+
+    public static String generateInvocation(String expr, String ifClassName,
+	    String elseClassName) {
+	return format("new %s(this).evaluate(\"%s\", %s.class, %s.class); \n",
+		IfTag.class.getName(), expr, ifClassName, elseClassName);
+
     }
 }

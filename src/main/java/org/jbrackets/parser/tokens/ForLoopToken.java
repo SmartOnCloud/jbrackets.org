@@ -1,8 +1,7 @@
 package org.jbrackets.parser.tokens;
 
-import static java.lang.String.format;
-
 import org.jbrackets.parser.ParseException;
+import org.jbrackets.tags.ForEachTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +28,13 @@ public class ForLoopToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return format(
-		"new ForEachTag(this).iterate(\"%s\", \"%s\", %s.class);\n", it,
-		col, className);
+	return ForEachTag.generateInvocation(it, col, className);
     }
 
     @Override
     public String getImplementation() {
-	return class_construct(className, "Block", true, getTokens());
+	return class_construct(className, Block.class.getName(), true,
+		getTokens());
     }
 
 }
