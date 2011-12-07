@@ -1,0 +1,28 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://repo.mycompany.com/maven2"
+    }
+}
+
+task listJars << {
+    configurations.compile.each { File file -> println file.name }
+}
+
+archivesBaseName = 'jbrackets'
+
+dependencies {
+
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+	testCompile('log4j:log4j:1.2.16')
+	testCompile('org.slf4j:slf4j-log4j12:1.6.4')
+
+	compile('org.slf4j:slf4j-api:1.6.4')
+	compile('org.codehaus.janino:janino:2.5.16')
+	compile group: 'net.java.dev.javacc', name: 'javacc', version: '5.0'
+	compile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+	compile group: 'org.springframework', name: 'spring-webmvc', version: '3.0.6.RELEASE'
+	compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+}

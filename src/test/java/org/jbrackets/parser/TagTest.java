@@ -3,7 +3,6 @@ package org.jbrackets.parser;
 import java.io.StringReader;
 import java.util.List;
 
-import org.jbrackets.parser.tokens.TemplateToken;
 import org.junit.Assert;
 
 public abstract class TagTest {
@@ -11,8 +10,7 @@ public abstract class TagTest {
     protected void checkPass(List<String> i) throws ParseException {
 	for (String string : i) {
 	    TemplateParser parser = new TemplateParser(TagTest.gr(string));
-	    TemplateToken token = parser.process("name");
-	    System.out.println(token.getImplementation());
+	    parser.process("name");
 	}
     }
 

@@ -4,9 +4,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import org.springframework.context.expression.BeanFactoryAccessor;
-import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.Expression;
-import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -29,17 +27,14 @@ public abstract class Block {
     public static Object eval(String expr, Object ctx) {
 	StandardEvaluationContext context = new StandardEvaluationContext();
 	SpelExpressionParser parser = new SpelExpressionParser();
-
 	context.addPropertyAccessor(new ReflectivePropertyAccessor());
 	context.addPropertyAccessor(new BeanFactoryAccessor());
-	context.addPropertyAccessor(new MapAccessor());
-	// TODO make this "silent fail over" configurable
-	try {
-	    Expression parseExpression = parser.parseExpression(expr);
-	    return parseExpression.getValue(context, ctx);
-	} catch (SpelEvaluationException e) {
-	    return null;
-	}
+	context.addPropertyAccessor(new MapFailoverAccessor());
+	// TODO add BeanResolver to have access to ctx beans
+	// TODO register functions, i.e. date formating
+	// context.registerFunction(name, method)
+	Expression parseExpression = parser.parseExpression(expr);
+	return parseExpression.getValue(context, ctx);
     }
 
     public PrintWriter getWr() {

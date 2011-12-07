@@ -1,0 +1,5 @@
+{% extends name %}
+this is name block
+{% block name%}
+some text
+{% endblock name2 %}
