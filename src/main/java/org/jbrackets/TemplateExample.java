@@ -1,7 +1,5 @@
 package org.jbrackets;
 
-import static java.lang.System.out;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;

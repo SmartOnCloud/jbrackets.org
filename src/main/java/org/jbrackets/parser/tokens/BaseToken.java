@@ -67,10 +67,12 @@ public abstract class BaseToken {
 	s.append("// ---\n");
 	s.append(format("public%s class %s extends %s {\n",
 		isStatic ? " static" : "", className, parentClass));
-	s.append("\tprotected void main() {\n");
-	for (BaseToken tok : toks)
-	    s.append("\t\t" + tok.getInvocation());
-	s.append("\t};\n");
+	if (parentClass.equals("Block")) {
+	    s.append("\tprotected void main() {\n");
+	    for (BaseToken tok : toks)
+		s.append("\t\t" + tok.getInvocation());
+	    s.append("\t};\n");
+	}
 	for (BaseToken tok : toks)
 	    s.append(tok.getImplementation());
 	s.append("}\n");
