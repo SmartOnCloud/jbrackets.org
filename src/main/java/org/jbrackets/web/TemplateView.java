@@ -1,20 +1,34 @@
 package org.jbrackets.web;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jbrackets.TemplateEngine;
+import org.jbrackets.parser.ParseException;
 import org.springframework.web.servlet.view.InternalResourceView;
 
-
-// USAGE:
-//<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-//  <property name="prefix" value="/WEB-INF/views/" />
-//  <property name="suffix" value=".html" />
-//  <property name="viewClass" value="org.jbrackets.web.TemplateView" />
-//</bean>
+/**
+ * USAGE:
+ * 
+ * <pre>
+ * <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+ *   <property name="prefix" value="/WEB-INF/views/" />
+ *   <property name="suffix" value=".html" />
+ *   <property name="viewClass" value="org.jbrackets.web.TemplateView" />
+ * </bean>
+ * </pre>
+ */
 
 public class TemplateView extends InternalResourceView {
     private TemplateEngine templateEngine = new TemplateEngine();
@@ -23,8 +37,35 @@ public class TemplateView extends InternalResourceView {
 	    HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
 	String templateFile = getServletContext().getRealPath(getUrl());
-	String process = templateEngine.process(templateFile, model);
+	try {
+	    String process = templateEngine.process(templateFile, model);
+	    response.setContentType(getContentType());
+	    response.getWriter().print(process);
+	} catch (ParseException e) {
+	    generateErrorPage(model, request, response, e);
+	}
+    }
+
+    private void generateErrorPage(Map<String, Object> model,
+	    HttpServletRequest request, HttpServletResponse response,
+	    ParseException e) throws IOException, ParseException,
+	    URISyntaxException {
+	URL resource = getClass().getResource("/error/error_message.html");
+	StringWriter trace = new StringWriter();
+	PrintWriter s = new PrintWriter(trace);
+	e.printStackTrace(s);
+	s.flush();
+
+	model.put("ex_title", e.getClass().getName());
+	model.put("ex_subtitle", "");
+	model.put("ex_requestMethod", request.getMethod());
+	model.put("ex_requestURI", request.getRequestURI());
+	model.put("ex_stacktrace", escapeHtml(trace.toString()));
+	model.put("ex_message", escapeHtml(e.getMessage()));
+
 	response.setContentType(getContentType());
-	response.getWriter().print(process);
+	response.getWriter().print(
+		templateEngine.process(new File(resource.toURI()).getPath(),
+			model));
     }
 }

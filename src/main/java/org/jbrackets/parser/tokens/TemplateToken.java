@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 public class TemplateToken extends BaseToken {
-    private static Logger log = LoggerFactory.getLogger(TemplateToken.class);
+    private Logger log = LoggerFactory.getLogger(getClass());
 
     private String templateName;
 
@@ -36,8 +36,8 @@ public class TemplateToken extends BaseToken {
 
     @Override
     public String getImplementation() {
-	return class_construct(getTemplateClassName(), "Block",
-		false, getTokens());
+	return class_construct(getTemplateClassName(), "Block", false,
+		getTokens());
     }
 
 }

@@ -1,0 +1,34 @@
+<html>
+<style type="text/css">
+{% include style.css %}
+</style>
+<body>
+ <div id="summary">
+    <h1> {{ ex_title }} <span>{{ ex_subtitle }}</span></h1>
+    <table class="meta">
+      <tr>
+        <th>Request Method:</th>
+      <td>{{ ex_requestMethod }}</td>
+      </tr>
+      <tr>
+        <th>Request URL:</th>
+        <td>{{ ex_requestURI }}</td>
+      </tr>
+    </table>
+  </div>
+  <div id="info">
+    <pre>{{ ex_message }}</pre>
+  </div>
+  <div id="explanation">
+    <p>
+      You're seeing this error because you have <code>DEBUG = True</code> in
+      your <strong>jbrackets</strong> settings file. Change that to <code>False</code>, and <strong>jbrackets</strong>
+      will display a standard page.
+    </p>
+  </div>
+    <div id="info">
+    <h1>Full Stacktrace</h1>
+    <pre>{{ ex_stacktrace }}</pre>
+  </div>
+  </body>
+</html>

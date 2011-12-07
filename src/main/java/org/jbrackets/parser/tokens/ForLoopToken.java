@@ -12,7 +12,7 @@ public class ForLoopToken extends BaseToken {
 
     private String it;
     private String col;
-    private String className = "FoorLoop_" + generateClassName();
+    private String className = "FORLOOP_" + generateClassName();
 
     public ForLoopToken() {
     }
@@ -30,7 +30,7 @@ public class ForLoopToken extends BaseToken {
     @Override
     public String getInvocation() {
 	return format(
-		"new ForEachTag(this).iterate(\"%s\", \"%s\", %s.class);", it,
+		"new ForEachTag(this).iterate(\"%s\", \"%s\", %s.class);\n", it,
 		col, className);
     }
 
