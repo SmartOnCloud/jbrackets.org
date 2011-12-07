@@ -64,7 +64,6 @@ public abstract class BaseToken {
     protected String class_construct(String className, String parentClass,
 	    boolean isStatic, List<BaseToken> toks) {
 	StringBuilder s = new StringBuilder();
-	s.append("// ---\n");
 	s.append(format("public%s class %s extends %s {\n",
 		isStatic ? " static" : "", className, parentClass));
 	if (parentClass.equals(Block.class.getName())) {

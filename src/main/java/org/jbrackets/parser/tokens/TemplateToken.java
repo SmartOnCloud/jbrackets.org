@@ -36,8 +36,8 @@ public class TemplateToken extends BaseToken {
 
     @Override
     public String getImplementation() {
-	return class_construct(getTemplateClassName(), Block.class.getName(), false,
-		getTokens());
+	return class_construct(getTemplateClassName(), Block.class.getName(),
+		false, getTokens());
     }
 
 }

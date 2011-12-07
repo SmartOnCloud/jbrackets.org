@@ -19,7 +19,7 @@ public class ExtendsTemplateToken extends TemplateToken {
 
     @Override
     public String getImplementation() {
-	return class_construct(getTemplateClassName(),
-		getParentClassName(), false, getTokens());
+	return class_construct(getTemplateClassName(), getParentClassName(),
+		false, getTokens());
     }
 }

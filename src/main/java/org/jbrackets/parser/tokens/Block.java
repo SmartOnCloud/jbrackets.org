@@ -29,7 +29,7 @@ public abstract class Block {
     public static Object eval(String expr, Object ctx) {
 	StandardEvaluationContext context = new StandardEvaluationContext();
 	SpelExpressionParser parser = new SpelExpressionParser();
-	
+
 	context.addPropertyAccessor(new ReflectivePropertyAccessor());
 	context.addPropertyAccessor(new BeanFactoryAccessor());
 	context.addPropertyAccessor(new MapAccessor());

@@ -13,7 +13,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.jbrackets.TemplateEngine;
 import org.jbrackets.parser.ParseException;
 import org.springframework.web.servlet.view.InternalResourceView;

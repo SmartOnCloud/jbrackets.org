@@ -40,8 +40,10 @@ public class InputTextRenderer implements Renderer {
 	    FieldError error) {
 	CharField metadata = (CharField) annotation;
 	if (error != null) {
-	    return format("<label for='%s' class='error' title='%s'>%s</label>",
-		    getId(field), error.getDefaultMessage(), getLabel(metadata, field));
+	    return format(
+		    "<label for='%s' class='error' title='%s'>%s</label>",
+		    getId(field), error.getDefaultMessage(),
+		    getLabel(metadata, field));
 	}
 	return format("<label for='%s'>%s</label>", getId(field),
 		getLabel(metadata, field));
