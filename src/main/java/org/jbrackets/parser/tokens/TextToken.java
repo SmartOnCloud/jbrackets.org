@@ -1,5 +1,7 @@
 package org.jbrackets.parser.tokens;
 
+import static java.lang.String.format;
+
 import org.apache.commons.lang.StringEscapeUtils;
 
 public class TextToken extends BaseToken {
@@ -16,7 +18,7 @@ public class TextToken extends BaseToken {
     public void setText(String text) {
 	this.text = new StringBuilder(replaceChars(text));
     }
-    
+
     @Override
     public void appendText(String text) {
 	this.text.append(replaceChars(text));
@@ -28,11 +30,7 @@ public class TextToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	StringBuilder s = new StringBuilder();
-	s.append("\t\twr.print(\"");
-	s.append(getText());
-	s.append("\");\n");
-	return s.toString();
+	return format("wr.print(\"%s\");\n", getText().toString());
     }
 
     @Override

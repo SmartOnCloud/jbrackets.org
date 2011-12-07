@@ -19,12 +19,15 @@ import org.jbrackets.parser.ParseException;
 import org.jbrackets.parser.TemplateParser;
 import org.jbrackets.parser.tokens.Block;
 import org.jbrackets.parser.tokens.TemplateToken;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Thread-safe stateless implementation of template engine
  */
 public class TemplateEngine {
+
+    private static Logger log = LoggerFactory.getLogger(TemplateEngine.class);
 
     public TemplateEngine() {
     }
@@ -39,6 +42,8 @@ public class TemplateEngine {
 
 	HashSet<String> alreadyProcessed = new HashSet<String>();
 	processTeplate(templateFile, templateName, s, alreadyProcessed);
+	if (log.isTraceEnabled())
+	    log.trace("generated source:\n" + s);
 
 	try {
 	    Block newInstance = compile(templateName, s.toString())
@@ -56,6 +61,8 @@ public class TemplateEngine {
 	    String templateClassName, StringBuilder s,
 	    HashSet<String> alreadyProcessed) throws IOException {
 	try {
+	    if (log.isTraceEnabled())
+		log.trace("processing template:" + templateFile.getPath());
 	    alreadyProcessed.add(templateClassName);
 	    FileInputStream is = new FileInputStream(templateFile);
 	    TemplateParser parser = new TemplateParser(is);
@@ -68,6 +75,10 @@ public class TemplateEngine {
 		if (!alreadyProcessed.contains(templateClassToGenerate)) {
 		    parser = processTeplate(file, templateClassToGenerate, s,
 			    alreadyProcessed);
+		} else {
+		    if (log.isTraceEnabled())
+			log.trace("already processed template [ignoring]:"
+				+ file.getPath());
 		}
 	    }
 	    return parser;

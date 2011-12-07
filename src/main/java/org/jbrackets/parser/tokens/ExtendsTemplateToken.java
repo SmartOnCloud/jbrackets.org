@@ -19,17 +19,7 @@ public class ExtendsTemplateToken extends TemplateToken {
 
     @Override
     public String getImplementation() {
-	StringBuilder s = new StringBuilder();
-
-	s.append("public class ").append(getTemplateClassName())
-		.append(" extends ").append(getParentClassName())
-		.append(" {\n");
-
-	for (BaseToken tok : getTokens()) {
-	    s.append(tok.getImplementation());
-	}
-	s.append("}\n");
-	return s.toString();
+	return class_construct(getTemplateClassName(),
+		getParentClassName(), false, getTokens());
     }
-
 }

@@ -1,10 +1,16 @@
 package org.jbrackets.parser.tokens;
 
+import static java.lang.String.format;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class IfToken extends BaseToken {
+    private static Logger log = LoggerFactory.getLogger(IfToken.class);
 
     private String expr;
-    private String ifClassName = "If_" + getGenClassName();
-    private String elseClassName = "ElseIf_" + getGenClassName();
+    private String ifClassName = "IF_" + generateClassName();
+    private String elseClassName = "ELSE_" + generateClassName();
 
     private BlockToken elseBlock = new BlockToken();
 
@@ -12,22 +18,16 @@ public class IfToken extends BaseToken {
     }
 
     public void setParam(String param) {
+	if (log.isDebugEnabled())
+	    log.debug("expr:[" + param + "]");
 	expr = param;
     }
 
     @Override
     public String getInvocation() {
-	StringBuilder s = new StringBuilder();
-	s.append("\t\tnew IfTag(this).evaluate(\"");
-	s.append(expr);
-	s.append("\", ");
-	s.append(ifClassName);
-	s.append(".class,");
-	s.append(elseClassName);
-	s.append(".class);\n");
-
-	// s.append("new ForEachTag(this).iterate(\"job\", \"jobs\", Page2_ForLoop.class);");
-	return s.toString();
+	return format(
+		"new IfTag(this).evaluate(\"%s\", %s.class, %s.class); \n",
+		expr, ifClassName, elseClassName);
     }
 
     public BaseToken getIf() {
@@ -40,33 +40,9 @@ public class IfToken extends BaseToken {
 
     @Override
     public String getImplementation() {
-	StringBuilder s = new StringBuilder();
-	s.append("\tstatic public class ");
-	s.append(ifClassName);
-	s.append(" extends Block {\n");
-
-	s.append("\tprotected void main() {\n");
-	for (BaseToken tok : getTokens())
-	    s.append(tok.getInvocation());
-	s.append("\t};\n");
-	for (BaseToken tok : getTokens()) {
-	    s.append(tok.getImplementation());
-	}
-	s.append("\t}\n");
-
-	s.append("\tstatic public class ");
-	s.append(elseClassName);
-	s.append(" extends Block {\n");
-
-	s.append("\tprotected void main() {\n");
-	for (BaseToken tok : elseBlock.getTokens())
-	    s.append(tok.getInvocation());
-	s.append("\t};\n");
-	for (BaseToken tok : elseBlock.getTokens()) {
-	    s.append(tok.getImplementation());
-	}
-	s.append("\t}\n");
-	return s.toString();
+	return class_construct(ifClassName, "Block", true,
+		getTokens())
+		+ class_construct(elseClassName, "Block", true,
+			elseBlock.getTokens());
     }
-
 }

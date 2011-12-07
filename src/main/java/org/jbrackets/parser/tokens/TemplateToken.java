@@ -1,11 +1,19 @@
 package org.jbrackets.parser.tokens;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+
 public class TemplateToken extends BaseToken {
+    private static Logger log = LoggerFactory.getLogger(TemplateToken.class);
 
     private String templateName;
 
     public TemplateToken(String templateName) {
+	Assert.notNull(templateName);
 	this.templateName = templateName;
+	if (log.isDebugEnabled())
+	    log.debug("teamplate name:[" + templateName + "]");
     }
 
     public String getTemplateName() {
@@ -18,7 +26,7 @@ public class TemplateToken extends BaseToken {
 
     public static String getClassNameFromTemplateName(String templateName) {
 	return templateName.replace("../", "up_").replace("/", "_")
-		.replace(".", "_").replace("-", "_");
+		.replace(".", "_").replace("-", "_").toUpperCase();
     }
 
     @Override
@@ -28,19 +36,8 @@ public class TemplateToken extends BaseToken {
 
     @Override
     public String getImplementation() {
-	StringBuilder s = new StringBuilder();
-
-	s.append("public class ").append(getTemplateClassName())
-		.append(" extends Block {\n");
-	s.append("\tprotected void main() {\n");
-	for (BaseToken tok : getTokens())
-	    s.append(tok.getInvocation());
-	s.append("\t};\n");
-	for (BaseToken tok : getTokens()) {
-	    s.append(tok.getImplementation());
-	}
-	s.append("}\n");
-	return s.toString();
+	return class_construct(getTemplateClassName(), "Block",
+		false, getTokens());
     }
 
 }

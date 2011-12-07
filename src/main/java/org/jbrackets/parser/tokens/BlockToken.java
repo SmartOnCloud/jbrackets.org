@@ -1,21 +1,18 @@
 package org.jbrackets.parser.tokens;
 
-import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BlockToken extends BaseToken {
+    private static Logger log = LoggerFactory.getLogger(BlockToken.class);
+
     private String name;
-    
+
     public BlockToken() {
     }
 
     public BlockToken(String name) {
-	this.name = name;
-    }
-
-    public BlockToken(String name, List<BaseToken> tokens) {
-	this.name = name;
-	setTokens(tokens);
+	setName(name);
     }
 
     public String getName() {
@@ -23,25 +20,18 @@ public class BlockToken extends BaseToken {
     }
 
     public void setName(String name) {
+	if (log.isDebugEnabled())
+	    log.debug("block name:[" + name + "]");
 	this.name = name;
     }
 
     @Override
     public String getInvocation() {
-	StringBuilder s = new StringBuilder();
-	s.append("\t\t").append(name).append("();\n");
-	return s.toString();
+	return String.format("%s();\n", name);
     }
 
     @Override
     public String getImplementation() {
-	StringBuilder s = new StringBuilder();
-	s.append("\tprotected void ").append(name).append("() { \n");
-	for (BaseToken tok : getTokens())
-	    s.append(tok.getInvocation());
-	s.append("\t}\n");
-	for (BaseToken tok : getTokens())
-	    s.append(tok.getImplementation());
-	return s.toString();
+	return method_construct(name);
     }
 }

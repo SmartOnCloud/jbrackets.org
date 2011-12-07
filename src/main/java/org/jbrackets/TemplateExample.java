@@ -1,9 +1,10 @@
 package org.jbrackets;
 
+import static java.lang.System.out;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 
 public class TemplateExample {
@@ -16,12 +17,7 @@ public class TemplateExample {
 
 	// --
 	TemplateEngine templateEngine = new TemplateEngine();
-	for (int i = 0; i < 1; i++) {
-	    Date date = new Date();
-	    String output = templateEngine.process(path + "/main/index.html",
-		    ctx);
-	    System.out.print(output);
-	    System.out.println(new Date().getTime() - date.getTime() + "ms");
-	}
+	templateEngine.process(path + "/template.html", ctx);
+	templateEngine.process(path + "/main/index.html", ctx);
     }
 }

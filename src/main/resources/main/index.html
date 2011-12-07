@@ -4,4 +4,9 @@
 hello world {{ jobs }}
 {% include include.html %}
 {% include ../include.html %}
+{% if !jobs.equals(null) %}
+if
+{% else %}
+else
+{% endif %}
 {% endblock %}
