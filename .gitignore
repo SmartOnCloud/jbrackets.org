@@ -2,4 +2,6 @@
 target
 .classpath
 .settings
+.gradle
+build
 rebel.xml
