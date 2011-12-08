@@ -97,7 +97,7 @@ public abstract class BaseToken {
     protected String method_construct(String name) {
 	StringBuilder s = new StringBuilder();
 	s.append(format(
-		"\tprotected void %s() throws org.jbrackets.parser.ParseException { \n",
+		"\tprotected void %s(java.util.Map ctx) throws org.jbrackets.parser.ParseException { \n",
 		name));
 	for (BaseToken tok : getTokens())
 	    s.append("\t\t" + tok.getInvocation());

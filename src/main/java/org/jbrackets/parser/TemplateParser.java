@@ -47,6 +47,7 @@ public class TemplateParser implements TemplateParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case EXP_LFT:
       case TAG_BLOCK:
+      case TAG_SET:
       case TAG_FOR:
       case TAG_IF:
       case TAG_INCLUDE:
@@ -68,6 +69,10 @@ public class TemplateParser implements TemplateParserConstants {
         break;
       case EXP_LFT:
         child = expr();
+      tok.addToken(child);
+        break;
+      case TAG_SET:
+        child = set_tag();
       tok.addToken(child);
         break;
       case TAG_BLOCK:
@@ -157,6 +162,18 @@ public class TemplateParser implements TemplateParserConstants {
     jj_consume_token(END_BR);
     tok.setParam(param);
     templates.add(param);
+    {if (true) return tok;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final public SetToken set_tag() throws ParseException {
+  String param;
+  SetToken tok;
+    jj_consume_token(TAG_SET);
+    tok = new SetToken(token);
+    param = tag_param();
+    jj_consume_token(END_BR);
+    tok.setParam(param);
     {if (true) return tok;}
     throw new Error("Missing return statement in function");
   }
@@ -260,7 +277,7 @@ public class TemplateParser implements TemplateParserConstants {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x40,0x13298,0x13298,0x10000,0x400,0x10000,0x10000,0x10000,};
+      jj_la1_0 = new int[] {0x40,0x26598,0x26598,0x20000,0x800,0x20000,0x20000,0x20000,};
    }
 
   /** Constructor with InputStream. */
@@ -377,7 +394,7 @@ public class TemplateParser implements TemplateParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[18];
+    boolean[] la1tokens = new boolean[19];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -391,7 +408,7 @@ public class TemplateParser implements TemplateParserConstants {
         }
       }
     }
-    for (int i = 0; i < 18; i++) {
+    for (int i = 0; i < 19; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

@@ -1,6 +1,7 @@
 package org.jbrackets.parser.tokens;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jbrackets.parser.ParseException;
@@ -15,9 +16,10 @@ public abstract class Block {
     protected PrintWriter wr;
     protected Map<String, Object> ctx;
 
-    public void render(PrintWriter wr, Map<String, Object> model) {
+    public void render(PrintWriter wr, Map<String, Object> model)
+	    throws org.jbrackets.parser.ParseException {
 	this.wr = wr;
-	this.ctx = model;
+	this.ctx = new HashMap<String, Object>(model);
 	main();
     }
 
@@ -46,5 +48,5 @@ public abstract class Block {
 	return ctx;
     }
 
-    abstract protected void main();
+    abstract protected void main() throws org.jbrackets.parser.ParseException;
 }

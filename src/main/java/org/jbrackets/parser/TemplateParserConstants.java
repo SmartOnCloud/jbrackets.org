@@ -23,27 +23,29 @@ public interface TemplateParserConstants {
   /** RegularExpression Id. */
   int TAG_EXTENDS = 6;
   /** RegularExpression Id. */
-  int TAG_FOR = 7;
+  int TAG_SET = 7;
   /** RegularExpression Id. */
-  int TAG_ENDFOR = 8;
+  int TAG_FOR = 8;
   /** RegularExpression Id. */
-  int TAG_IF = 9;
+  int TAG_ENDFOR = 9;
   /** RegularExpression Id. */
-  int TAG_ELSE = 10;
+  int TAG_IF = 10;
   /** RegularExpression Id. */
-  int TAG_ENDIF = 11;
+  int TAG_ELSE = 11;
   /** RegularExpression Id. */
-  int TAG_INCLUDE = 12;
+  int TAG_ENDIF = 12;
   /** RegularExpression Id. */
-  int TAG_COMMENT_START = 13;
+  int TAG_INCLUDE = 13;
   /** RegularExpression Id. */
-  int TAG_COMMENT_END = 14;
+  int TAG_COMMENT_START = 14;
   /** RegularExpression Id. */
-  int EXP_RGH = 15;
+  int TAG_COMMENT_END = 15;
   /** RegularExpression Id. */
-  int CHARACTER = 16;
+  int EXP_RGH = 16;
   /** RegularExpression Id. */
-  int END_BR = 17;
+  int CHARACTER = 17;
+  /** RegularExpression Id. */
+  int END_BR = 18;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -61,6 +63,7 @@ public interface TemplateParserConstants {
     "<TAG_BLOCK>",
     "<TAG_ENDBLOCK>",
     "<TAG_EXTENDS>",
+    "<TAG_SET>",
     "<TAG_FOR>",
     "<TAG_ENDFOR>",
     "<TAG_IF>",

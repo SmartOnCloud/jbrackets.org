@@ -27,7 +27,7 @@ public class BlockToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return String.format("%s();\n", name);
+	return String.format("%s(new java.util.HashMap(ctx));\n", name);
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 import org.jbrackets.parser.ParseException;
+import org.jbrackets.parser.tokens.Block;
 import org.junit.Test;
 
 public class TemplateEngineTest {
@@ -24,6 +25,15 @@ public class TemplateEngineTest {
 	    URISyntaxException {
 	tested.process(getFilePath("/engine/inputOK.txt"),
 		new HashMap<String, Object>());
+    }
+
+    @Test
+    public void testSetToken() throws IOException, ParseException,
+	    URISyntaxException {
+	String process = tested.process(
+		getFilePath("/engine/inputSetTokenExpr.txt"),
+		new HashMap<String, Object>());
+	assertThat(process, is(equalTo("nested:name2,outer:name")));
     }
 
     @Test
@@ -95,7 +105,7 @@ public class TemplateEngineTest {
 	    assertThat(m.readLine().startsWith("line 6, column 17"), is(true));
 	}
     }
-    
+
     @Test
     public void testExpressionEvaluationExceptionForBlock() throws IOException,
 	    ParseException, URISyntaxException {

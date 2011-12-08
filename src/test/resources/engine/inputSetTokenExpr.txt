@@ -1,0 +1,1 @@
+{% set var "name" %}{% block name %}{% set var "name2" %}nested:{{ var }}{% endblock %},outer:{{ var }}
