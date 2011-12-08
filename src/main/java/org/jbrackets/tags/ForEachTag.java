@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jbrackets.parser.ParseException;
 import org.jbrackets.parser.tokens.Block;
 
 public class ForEachTag extends Tag {
@@ -21,7 +22,7 @@ public class ForEachTag extends Tag {
     }
 
     public void iterate(String it, String iterationKey,
-	    Class<? extends Block> tmpl) {
+	    Class<? extends Block> tmpl) throws ParseException {
 	try {
 	    Object value = Block.eval(iterationKey, ctx);
 	    if (value.getClass().isArray())
@@ -37,7 +38,9 @@ public class ForEachTag extends Tag {
 		counter++;
 		counter0++;
 	    }
-	} catch (Exception e) {
+	} catch (InstantiationException e) {
+	    throw new RuntimeException(e);
+	} catch (IllegalAccessException e) {
 	    throw new RuntimeException(e);
 	}
     }

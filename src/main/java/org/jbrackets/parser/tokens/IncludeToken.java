@@ -11,6 +11,9 @@ public class IncludeToken extends BaseToken {
 
     private String template;
 
+    public IncludeToken() {
+    }
+
     public void setParam(String template) {
 	if (log.isDebugEnabled())
 	    log.debug("include:[" + template + "]");
@@ -27,5 +30,4 @@ public class IncludeToken extends BaseToken {
     public String getImplementation() {
 	return "";
     }
-
 }

@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 
+import org.jbrackets.parser.ParseException;
 import org.jbrackets.parser.tokens.Block;
 
 public class IfTag extends Tag {
@@ -14,14 +15,16 @@ public class IfTag extends Tag {
     }
 
     public void evaluate(String expr, Class<? extends Block> ifblock,
-	    Class<? extends Block> elseBlock) {
+	    Class<? extends Block> elseBlock) throws ParseException {
 	try {
 	    Object eval = Block.eval(expr, ctx);
 	    if (eval.equals(Boolean.TRUE))
 		ifblock.newInstance().render(wr, ctx);
 	    else
 		elseBlock.newInstance().render(wr, ctx);
-	} catch (Exception e) {
+	} catch (InstantiationException e) {
+	    throw new RuntimeException(e);
+	} catch (IllegalAccessException e) {
 	    throw new RuntimeException(e);
 	}
     }

@@ -3,6 +3,7 @@ package org.jbrackets.parser.tokens;
 import java.io.PrintWriter;
 import java.util.Map;
 
+import org.jbrackets.parser.ParseException;
 import org.springframework.context.expression.BeanFactoryAccessor;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -20,11 +21,11 @@ public abstract class Block {
 	main();
     }
 
-    public Object eval(String expr) {
+    public Object eval(String expr) throws ParseException {
 	return eval(expr, ctx);
     }
 
-    public static Object eval(String expr, Object ctx) {
+    public static Object eval(String expr, Object ctx) throws ParseException {
 	StandardEvaluationContext context = new StandardEvaluationContext();
 	SpelExpressionParser parser = new SpelExpressionParser();
 	context.addPropertyAccessor(new ReflectivePropertyAccessor());

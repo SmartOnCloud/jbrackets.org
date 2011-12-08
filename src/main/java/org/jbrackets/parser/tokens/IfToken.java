@@ -1,5 +1,6 @@
 package org.jbrackets.parser.tokens;
 
+import org.jbrackets.parser.Token;
 import org.jbrackets.tags.IfTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,10 @@ public class IfToken extends BaseToken {
 
     private BlockToken elseBlock = new BlockToken();
 
-    public IfToken() {
+    private final Token tok;
+
+    public IfToken(Token tok) {
+	this.tok = tok;
     }
 
     public void setParam(String param) {
@@ -24,7 +28,8 @@ public class IfToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return IfTag.generateInvocation(expr, ifClassName, elseClassName);
+	return surroundBySpelParseExceptionCatch(tok,
+		IfTag.generateInvocation(expr, ifClassName, elseClassName));
     }
 
     public BaseToken getIf() {

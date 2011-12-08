@@ -5,8 +5,12 @@ import java.util.*;
 
 public class TemplateParser implements TemplateParserConstants {
   List < String > definedBlocks = new ArrayList < String > ();
+  List < String > templates = new ArrayList < String > ();
 
-  public List < String > templates = new ArrayList < String > ();
+  public List < String > getTemplate()
+  {
+    return templates;
+  }
 
 // --------- parser ----------  final public TemplateToken process(String templateName) throws ParseException {
   definedBlocks = new ArrayList < String > ();
@@ -132,8 +136,9 @@ public class TemplateParser implements TemplateParserConstants {
 
   final public ForLoopToken for_tag() throws ParseException {
   String param;
-  ForLoopToken tok = new ForLoopToken();
+  ForLoopToken tok;
     jj_consume_token(TAG_FOR);
+    tok = new ForLoopToken(token);
     param = tag_param();
     jj_consume_token(END_BR);
     body(tok);
@@ -145,8 +150,9 @@ public class TemplateParser implements TemplateParserConstants {
 
   final public IncludeToken include_tag() throws ParseException {
   String param;
-  IncludeToken tok = new IncludeToken();
+  IncludeToken tok;
     jj_consume_token(TAG_INCLUDE);
+    tok = new IncludeToken();
     param = tag_param();
     jj_consume_token(END_BR);
     tok.setParam(param);
@@ -157,8 +163,9 @@ public class TemplateParser implements TemplateParserConstants {
 
   final public IfToken if_tag() throws ParseException {
   String param;
-  IfToken tok = new IfToken();
+  IfToken tok;
     jj_consume_token(TAG_IF);
+    tok = new IfToken(token);
     param = tag_param();
     jj_consume_token(END_BR);
     body(tok.getIf());
@@ -179,7 +186,9 @@ public class TemplateParser implements TemplateParserConstants {
 
   final public ExpToken expr() throws ParseException {
   StringBuilder expr = new StringBuilder();
+  Token tok;
     jj_consume_token(EXP_LFT);
+    tok = token;
     label_3:
     while (true) {
       jj_consume_token(CHARACTER);
@@ -194,7 +203,7 @@ public class TemplateParser implements TemplateParserConstants {
       }
     }
     jj_consume_token(EXP_RGH);
-    {if (true) return new ExpToken(expr.toString());}
+    {if (true) return new ExpToken(expr.toString(), tok);}
     throw new Error("Missing return statement in function");
   }
 

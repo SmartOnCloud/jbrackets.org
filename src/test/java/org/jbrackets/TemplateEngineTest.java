@@ -64,6 +64,56 @@ public class TemplateEngineTest {
     }
 
     @Test
+    public void testExpressionEvaluationException() throws IOException,
+	    ParseException, URISyntaxException {
+	try {
+	    tested.process(getFilePath("/engine/inputExprEvalProblem.txt"),
+		    new HashMap<String, Object>());
+	    fail();
+	} catch (ParseException pe) {
+	    BufferedReader m = new BufferedReader(new StringReader(
+		    pe.getMessage()));
+	    assertThat(m.readLine().endsWith("inputExprEvalProblem.txt"),
+		    is(true));
+	    assertThat(m.readLine().startsWith("line 1, column 17"), is(true));
+	}
+    }
+
+    @Test
+    public void testExpressionEvaluationExceptionIfBlock() throws IOException,
+	    ParseException, URISyntaxException {
+	try {
+	    tested.process(getFilePath("/engine/inputExprEvalProblemIf.txt"),
+		    new HashMap<String, Object>());
+	    fail();
+	} catch (ParseException pe) {
+	    System.out.println(pe.getMessage());
+	    BufferedReader m = new BufferedReader(new StringReader(
+		    pe.getMessage()));
+	    assertThat(m.readLine().endsWith("inputExprEvalProblemIf.txt"),
+		    is(true));
+	    assertThat(m.readLine().startsWith("line 6, column 17"), is(true));
+	}
+    }
+    
+    @Test
+    public void testExpressionEvaluationExceptionForBlock() throws IOException,
+	    ParseException, URISyntaxException {
+	try {
+	    tested.process(getFilePath("/engine/inputExprEvalProblemFor.txt"),
+		    new HashMap<String, Object>());
+	    fail();
+	} catch (ParseException pe) {
+	    System.out.println(pe.getMessage());
+	    BufferedReader m = new BufferedReader(new StringReader(
+		    pe.getMessage()));
+	    assertThat(m.readLine().endsWith("inputExprEvalProblemFor.txt"),
+		    is(true));
+	    assertThat(m.readLine().startsWith("line 5, column 1"), is(true));
+	}
+    }
+
+    @Test
     public void testElvisOperator() throws IOException, ParseException,
 	    URISyntaxException {
 	String process = tested.process(

@@ -9,6 +9,8 @@ public class TemplateToken extends BaseToken {
 
     private String templateName;
 
+    private String filePath;
+
     public TemplateToken(String templateName) {
 	Assert.notNull(templateName);
 	this.templateName = templateName;
@@ -38,6 +40,15 @@ public class TemplateToken extends BaseToken {
     public String getImplementation() {
 	return class_construct(getTemplateClassName(), Block.class.getName(),
 		false, getTokens());
+    }
+    
+    @Override
+    protected String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
 }

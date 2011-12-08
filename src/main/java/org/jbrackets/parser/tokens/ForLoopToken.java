@@ -1,6 +1,7 @@
 package org.jbrackets.parser.tokens;
 
 import org.jbrackets.parser.ParseException;
+import org.jbrackets.parser.Token;
 import org.jbrackets.tags.ForEachTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,10 @@ public class ForLoopToken extends BaseToken {
     private String col;
     private String className = "FORLOOP_" + generateClassName();
 
-    public ForLoopToken() {
+    private Token tok;
+
+    public ForLoopToken(Token tok) {
+	this.tok = tok;
     }
 
     public void setParam(String param) throws ParseException {
@@ -28,7 +32,8 @@ public class ForLoopToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return ForEachTag.generateInvocation(it, col, className);
+	return surroundBySpelParseExceptionCatch(tok,
+		ForEachTag.generateInvocation(it, col, className));
     }
 
     @Override

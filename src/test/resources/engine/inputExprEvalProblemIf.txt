@@ -1,0 +1,8 @@
+
+
+
+
+
+		{% if var a %}
+some output
+{% endif %}

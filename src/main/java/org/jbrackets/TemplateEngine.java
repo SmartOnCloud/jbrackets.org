@@ -103,8 +103,9 @@ public class TemplateEngine {
 	    FileInputStream is = new FileInputStream(templateFile);
 	    TemplateParser parser = new TemplateParser(is);
 	    TemplateToken tok = parser.process(templateClassName);
+	    tok.setFilePath(templateFile.getPath());
 	    s.append(tok.getImplementation());
-	    List<String> templates = parser.templates;
+	    List<String> templates = parser.getTemplate();
 	    for (String template : templates) {
 		File file = new File(templateFile.getParent() + "/" + template);
 		String templateClassToGenerate = getClassNameFromTemplateName(template);
