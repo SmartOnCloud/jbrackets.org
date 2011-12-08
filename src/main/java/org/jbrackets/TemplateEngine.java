@@ -14,8 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.janino.CompileException;
-import org.codehaus.janino.Scanner.ScanException;
+import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.SimpleCompiler;
 import org.jbrackets.parser.ParseException;
 import org.jbrackets.parser.TemplateParser;
@@ -82,10 +81,6 @@ public class TemplateEngine {
 	    return stringWriter.toString();
 	} catch (ClassNotFoundException e) {
 	    throw new RuntimeException(e);
-	} catch (ScanException e) {
-	    throw new RuntimeException(e);
-	} catch (org.codehaus.janino.Parser.ParseException e) {
-	    throw new RuntimeException(e);
 	} catch (CompileException e) {
 	    throw new RuntimeException(e);
 	} catch (InstantiationException e) {
@@ -147,8 +142,7 @@ public class TemplateEngine {
 
     @SuppressWarnings("unchecked")
     private static Class<? extends Block> compile(String fileName, String src)
-	    throws ScanException, org.codehaus.janino.Parser.ParseException,
-	    CompileException, IOException, ClassNotFoundException {
+	    throws CompileException, IOException, ClassNotFoundException {
 	SimpleCompiler simpleCompiler = new SimpleCompiler(fileName,
 		new StringReader(src));
 	ClassLoader classLoader = simpleCompiler.getClassLoader();
