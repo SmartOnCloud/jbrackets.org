@@ -52,6 +52,7 @@ public class TemplateEngine {
 	File templateFile = new File(templateFileName);
 	String templateName = getClassNameFromTemplateName(templateFile
 		.getName());
+	
 
 	HashSet<String> alreadyProcessed = new HashSet<String>();
 	processTeplate(templateFile, encoding, templateName, s,
