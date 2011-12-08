@@ -5,6 +5,11 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.jbrackets.parser.tokens.MapFailoverAccessor;
+import org.springframework.context.expression.BeanFactoryAccessor;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+
 public class TemplateExample {
 
     public static void main(String[] args) throws Exception {
@@ -15,7 +20,20 @@ public class TemplateExample {
 
 	// --
 	TemplateEngine templateEngine = new TemplateEngine();
-	templateEngine.process(path + "/template.html", "UTF-8", ctx);
-	templateEngine.process(path + "/main/index.html", "UTF-8", ctx);
+	StandardEvaluationContext context = createEvalContext();
+
+	templateEngine.process(path + "/template.html", "UTF-8", context, ctx);
+	templateEngine
+		.process(path + "/main/index.html", "UTF-8", context, ctx);
     }
+
+    private static StandardEvaluationContext createEvalContext() {
+	StandardEvaluationContext context = new StandardEvaluationContext();
+	context.addPropertyAccessor(new ReflectivePropertyAccessor());
+	context.addPropertyAccessor(new BeanFactoryAccessor());
+	context.addPropertyAccessor(new MapFailoverAccessor());
+	return context;
+    }
+
+    // ----------------
 }

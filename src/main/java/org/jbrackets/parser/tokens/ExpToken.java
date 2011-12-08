@@ -30,6 +30,5 @@ public class ExpToken extends TextToken {
 	    parseException.setStackTrace(e.getStackTrace());
 	    throw parseException;
 	}
-
     }
 }

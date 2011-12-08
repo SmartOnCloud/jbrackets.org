@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jbrackets.TemplateEngine;
 import org.jbrackets.parser.ParseException;
+import org.jbrackets.parser.tokens.MapFailoverAccessor;
+import org.springframework.context.expression.BeanFactoryAccessor;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.web.servlet.view.InternalResourceView;
 
 /**
@@ -32,13 +36,21 @@ import org.springframework.web.servlet.view.InternalResourceView;
 public class TemplateView extends InternalResourceView {
     private TemplateEngine templateEngine = new TemplateEngine();
 
+    private StandardEvaluationContext createEvalContext() {
+	StandardEvaluationContext context = new StandardEvaluationContext();
+	context.addPropertyAccessor(new ReflectivePropertyAccessor());
+	context.addPropertyAccessor(new BeanFactoryAccessor());
+	context.addPropertyAccessor(new MapFailoverAccessor());
+	return context;
+    }
+
     protected void renderMergedOutputModel(Map<String, Object> model,
 	    HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
 	String templateFile = getServletContext().getRealPath(getUrl());
 	try {
 	    String process = templateEngine.process(templateFile, "UTF-8",
-		    model);
+		    createEvalContext(), model);
 	    response.setContentType(getContentType());
 	    response.getWriter().print(process);
 	} catch (ParseException e) {
@@ -66,6 +78,6 @@ public class TemplateView extends InternalResourceView {
 	response.setContentType(getContentType());
 	response.getWriter().print(
 		templateEngine.process(new File(resource.toURI()).getPath(),
-			"UTF-8", model));
+			"UTF-8", createEvalContext(), model));
     }
 }

@@ -20,11 +20,17 @@ import org.codehaus.janino.SimpleCompiler;
 import org.jbrackets.parser.ParseException;
 import org.jbrackets.parser.TemplateParser;
 import org.jbrackets.parser.tokens.Block;
+import org.jbrackets.parser.tokens.MapFailoverAccessor;
 import org.jbrackets.parser.tokens.TemplateToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.expression.BeanFactoryAccessor;
+import org.springframework.expression.Expression;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelParseException;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 /**
  * Thread-safe stateless implementation of template engine
@@ -42,7 +48,8 @@ public class TemplateEngine {
     }
 
     public String process(String templateFileName, String encoding,
-	    Map<String, Object> ctx) throws IOException, ParseException {
+	    StandardEvaluationContext context, Map<String, Object> ctx)
+	    throws ParseException {
 
 	if (log.isDebugEnabled())
 	    startGen = new Date();
@@ -52,7 +59,6 @@ public class TemplateEngine {
 	File templateFile = new File(templateFileName);
 	String templateName = getClassNameFromTemplateName(templateFile
 		.getName());
-	
 
 	HashSet<String> alreadyProcessed = new HashSet<String>();
 	processTeplate(templateFile, encoding, templateName, s,
@@ -70,6 +76,9 @@ public class TemplateEngine {
 	    if (log.isDebugEnabled())
 		endCompile = new Date();
 	    StringWriter stringWriter = new StringWriter();
+
+	    newInstance.setEvalContext(context);
+
 	    newInstance.render(new PrintWriter(stringWriter), ctx);
 	    stringWriter.flush();
 	    if (log.isDebugEnabled()) {
@@ -94,6 +103,13 @@ public class TemplateEngine {
 	    throw new RuntimeException(e);
 	} catch (IllegalAccessException e) {
 	    throw new RuntimeException(e);
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	} catch (SpelEvaluationException e) {
+	    ParseException e2 = new ParseException(templateFile.getPath()
+		    + "\n" + e.getMessage());
+	    e2.setStackTrace(e.getStackTrace());
+	    throw e2;
 	}
     }
 
@@ -112,7 +128,7 @@ public class TemplateEngine {
 	    s.append(tok.getImplementation());
 	    List<String> templates = parser.getTemplate();
 	    for (String template : templates) {
-		template = String.valueOf(Block.eval(template, ctx)).trim();
+		template = String.valueOf(eval(template, ctx)).trim();
 		File file = new File(templateFile.getParent() + "/" + template);
 		String templateClassToGenerate = getClassNameFromTemplateName(template);
 		if (!alreadyProcessed.contains(templateClassToGenerate)) {
@@ -157,5 +173,18 @@ public class TemplateEngine {
 	Class<? extends Block> loadClass = (Class<? extends Block>) classLoader
 		.loadClass(fileName);
 	return loadClass;
+    }
+
+    public Object eval(String expr, Object ctx) throws ParseException {
+	StandardEvaluationContext context = new StandardEvaluationContext();
+	SpelExpressionParser parser = new SpelExpressionParser();
+	context.addPropertyAccessor(new ReflectivePropertyAccessor());
+	context.addPropertyAccessor(new BeanFactoryAccessor());
+	context.addPropertyAccessor(new MapFailoverAccessor());
+	// TODO add BeanResolver to have access to ctx beans
+	// TODO register functions, i.e. date formating
+	// context.registerFunction(name, method)
+	Expression parseExpression = parser.parseExpression(expr);
+	return parseExpression.getValue(context, ctx);
     }
 }

@@ -22,7 +22,7 @@ public class IncludeToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return format("new %s().render(wr, ctx);\n",
+	return format("new %s().setEvalContext(evalContext).render(wr, ctx);\n",
 		getClassNameFromTemplateName(template));
     }
 
