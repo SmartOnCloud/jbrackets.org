@@ -14,7 +14,6 @@ import java.net.URL;
 import java.util.HashMap;
 
 import org.jbrackets.parser.ParseException;
-import org.jbrackets.parser.tokens.Block;
 import org.junit.Test;
 
 public class TemplateEngineTest {
@@ -23,7 +22,7 @@ public class TemplateEngineTest {
     @Test
     public void testSimple() throws IOException, ParseException,
 	    URISyntaxException {
-	tested.process(getFilePath("/engine/inputOK.txt"),
+	tested.process(getFilePath("/engine/inputOK.txt"), "UTF-8",
 		new HashMap<String, Object>());
     }
 
@@ -31,7 +30,7 @@ public class TemplateEngineTest {
     public void testSetToken() throws IOException, ParseException,
 	    URISyntaxException {
 	String process = tested.process(
-		getFilePath("/engine/inputSetTokenExpr.txt"),
+		getFilePath("/engine/inputSetTokenExpr.txt"), "UTF-8",
 		new HashMap<String, Object>());
 	assertThat(process, is(equalTo("nested:name2,outer:name")));
     }
@@ -40,7 +39,7 @@ public class TemplateEngineTest {
     public void testParseException_Syntax_Javacc() throws IOException,
 	    ParseException, URISyntaxException {
 	try {
-	    tested.process(getFilePath("/engine/inputErrorJavac.txt"),
+	    tested.process(getFilePath("/engine/inputErrorJavac.txt"), "UTF-8",
 		    new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
@@ -57,7 +56,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputErrorJbracket.txt"),
-		    new HashMap<String, Object>());
+		    "UTF-8", new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    BufferedReader m = new BufferedReader(new StringReader(
@@ -78,7 +77,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputExprEvalProblem.txt"),
-		    new HashMap<String, Object>());
+		    "UTF-8", new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    BufferedReader m = new BufferedReader(new StringReader(
@@ -94,7 +93,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputExprEvalProblemIf.txt"),
-		    new HashMap<String, Object>());
+		    "UTF-8", new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    System.out.println(pe.getMessage());
@@ -111,7 +110,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputExprEvalProblemFor.txt"),
-		    new HashMap<String, Object>());
+		    "UTF-8", new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    System.out.println(pe.getMessage());
@@ -127,7 +126,7 @@ public class TemplateEngineTest {
     public void testElvisOperator() throws IOException, ParseException,
 	    URISyntaxException {
 	String process = tested.process(
-		getFilePath("/engine/inputElvisOperator.txt"),
+		getFilePath("/engine/inputElvisOperator.txt"), "UTF-8",
 		new HashMap<String, Object>());
 	assertThat(process, is(equalTo("alternative")));
     }

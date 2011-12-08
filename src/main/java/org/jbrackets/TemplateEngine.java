@@ -41,8 +41,8 @@ public class TemplateEngine {
     public TemplateEngine() {
     }
 
-    public String process(String templateFileName, Map<String, Object> ctx)
-	    throws IOException, ParseException {
+    public String process(String templateFileName, String encoding,
+	    Map<String, Object> ctx) throws IOException, ParseException {
 
 	if (log.isDebugEnabled())
 	    startGen = new Date();
@@ -54,7 +54,8 @@ public class TemplateEngine {
 		.getName());
 
 	HashSet<String> alreadyProcessed = new HashSet<String>();
-	processTeplate(templateFile, templateName, s, alreadyProcessed, ctx);
+	processTeplate(templateFile, encoding, templateName, s,
+		alreadyProcessed, ctx);
 	s.append("// -------------------------------END GENERATED--------------------------------------------------------------------------\n");
 	s.append("// ----------------------------------------------------------------------------------------------------------------------");
 	if (log.isDebugEnabled())
@@ -95,7 +96,7 @@ public class TemplateEngine {
 	}
     }
 
-    private TemplateParser processTeplate(File templateFile,
+    private TemplateParser processTeplate(File templateFile, String encoding,
 	    String templateClassName, StringBuilder s,
 	    HashSet<String> alreadyProcessed, Map<String, Object> ctx)
 	    throws ParseException {
@@ -104,7 +105,7 @@ public class TemplateEngine {
 	try {
 	    alreadyProcessed.add(templateClassName);
 	    FileInputStream is = new FileInputStream(templateFile);
-	    TemplateParser parser = new TemplateParser(is);
+	    TemplateParser parser = new TemplateParser(is, encoding);
 	    TemplateToken tok = parser.process(templateClassName);
 	    tok.setFilePath(templateFile.getPath());
 	    s.append(tok.getImplementation());
@@ -114,8 +115,8 @@ public class TemplateEngine {
 		File file = new File(templateFile.getParent() + "/" + template);
 		String templateClassToGenerate = getClassNameFromTemplateName(template);
 		if (!alreadyProcessed.contains(templateClassToGenerate)) {
-		    parser = processTeplate(file, templateClassToGenerate, s,
-			    alreadyProcessed, ctx);
+		    parser = processTeplate(file, encoding,
+			    templateClassToGenerate, s, alreadyProcessed, ctx);
 		} else {
 		    if (log.isTraceEnabled())
 			log.trace("already processed template [ignoring]:"
