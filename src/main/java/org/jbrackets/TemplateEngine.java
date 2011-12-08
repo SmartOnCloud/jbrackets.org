@@ -4,6 +4,7 @@ import static org.jbrackets.parser.tokens.TemplateToken.getClassNameFromTemplate
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -22,6 +23,8 @@ import org.jbrackets.parser.tokens.Block;
 import org.jbrackets.parser.tokens.TemplateToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.SpelParseException;
 
 /**
  * Thread-safe stateless implementation of template engine
@@ -51,7 +54,7 @@ public class TemplateEngine {
 		.getName());
 
 	HashSet<String> alreadyProcessed = new HashSet<String>();
-	processTeplate(templateFile, templateName, s, alreadyProcessed);
+	processTeplate(templateFile, templateName, s, alreadyProcessed, ctx);
 	s.append("// -------------------------------END GENERATED--------------------------------------------------------------------------\n");
 	s.append("// ----------------------------------------------------------------------------------------------------------------------");
 	if (log.isDebugEnabled())
@@ -94,8 +97,8 @@ public class TemplateEngine {
 
     private TemplateParser processTeplate(File templateFile,
 	    String templateClassName, StringBuilder s,
-	    HashSet<String> alreadyProcessed) throws IOException,
-	    ParseException {
+	    HashSet<String> alreadyProcessed, Map<String, Object> ctx)
+	    throws ParseException {
 	if (log.isTraceEnabled())
 	    log.trace("processing template:" + templateFile.getPath());
 	try {
@@ -107,11 +110,12 @@ public class TemplateEngine {
 	    s.append(tok.getImplementation());
 	    List<String> templates = parser.getTemplate();
 	    for (String template : templates) {
+		template = String.valueOf(Block.eval(template, ctx)).trim();
 		File file = new File(templateFile.getParent() + "/" + template);
 		String templateClassToGenerate = getClassNameFromTemplateName(template);
 		if (!alreadyProcessed.contains(templateClassToGenerate)) {
 		    parser = processTeplate(file, templateClassToGenerate, s,
-			    alreadyProcessed);
+			    alreadyProcessed, ctx);
 		} else {
 		    if (log.isTraceEnabled())
 			log.trace("already processed template [ignoring]:"
@@ -122,6 +126,20 @@ public class TemplateEngine {
 	} catch (ParseException e) {
 	    ParseException e2 = new ParseException(templateFile.getPath()
 		    + "\n" + e.getMessage());
+	    e2.setStackTrace(e.getStackTrace());
+	    throw e2;
+	} catch (SpelParseException e) {
+	    ParseException e2 = new ParseException(templateFile.getPath()
+		    + "\n" + e.getMessage());
+	    e2.setStackTrace(e.getStackTrace());
+	    throw e2;
+	} catch (SpelEvaluationException e) {
+	    ParseException e2 = new ParseException(templateFile.getPath()
+		    + "\n" + e.getMessage());
+	    e2.setStackTrace(e.getStackTrace());
+	    throw e2;
+	} catch (FileNotFoundException e) {
+	    ParseException e2 = new ParseException(e.getMessage());
 	    e2.setStackTrace(e.getStackTrace());
 	    throw e2;
 	}

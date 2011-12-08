@@ -28,7 +28,8 @@ public class TemplateToken extends BaseToken {
 
     public static String getClassNameFromTemplateName(String templateName) {
 	return templateName.replace("../", "up_").replace("/", "_")
-		.replace(".", "_").replace("-", "_").toUpperCase();
+		.replace("'", "").replace("\"", "").replace(".", "_")
+		.replace("-", "_").toUpperCase();
     }
 
     @Override
@@ -41,14 +42,14 @@ public class TemplateToken extends BaseToken {
 	return class_construct(getTemplateClassName(), Block.class.getName(),
 		false, getTokens());
     }
-    
+
     @Override
     protected String getFilePath() {
-        return filePath;
+	return filePath;
     }
 
     public void setFilePath(String filePath) {
-        this.filePath = filePath;
+	this.filePath = filePath;
     }
 
 }
