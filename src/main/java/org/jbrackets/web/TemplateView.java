@@ -37,7 +37,8 @@ public class TemplateView extends InternalResourceView {
 	    throws Exception {
 	String templateFile = getServletContext().getRealPath(getUrl());
 	try {
-	    String process = templateEngine.process(templateFile, model);
+	    String process = templateEngine.process(templateFile, "UTF-8",
+		    model);
 	    response.setContentType(getContentType());
 	    response.getWriter().print(process);
 	} catch (ParseException e) {
@@ -65,6 +66,6 @@ public class TemplateView extends InternalResourceView {
 	response.setContentType(getContentType());
 	response.getWriter().print(
 		templateEngine.process(new File(resource.toURI()).getPath(),
-			model));
+			"UTF-8", model));
     }
 }

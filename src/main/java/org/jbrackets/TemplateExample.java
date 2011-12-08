@@ -15,7 +15,7 @@ public class TemplateExample {
 
 	// --
 	TemplateEngine templateEngine = new TemplateEngine();
-	templateEngine.process(path + "/template.html", ctx);
-	templateEngine.process(path + "/main/index.html", ctx);
+	templateEngine.process(path + "/template.html", "UTF-8", ctx);
+	templateEngine.process(path + "/main/index.html", "UTF-8", ctx);
     }
 }
