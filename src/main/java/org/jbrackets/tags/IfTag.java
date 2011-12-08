@@ -9,19 +9,26 @@ import org.jbrackets.parser.tokens.Block;
 
 public class IfTag extends Tag {
 
+    private final Block container;
+
     public IfTag(Block container) {
 	super(container.getWr(),
 		new HashMap<String, Object>(container.getCtx()));
+	this.container = container;
     }
 
     public void evaluate(String expr, Class<? extends Block> ifblock,
 	    Class<? extends Block> elseBlock) throws ParseException {
 	try {
-	    Object eval = Block.eval(expr, ctx);
+	    Object eval = container.eval(expr, ctx);
 	    if (eval.equals(Boolean.TRUE))
-		ifblock.newInstance().render(wr, ctx);
+		ifblock.newInstance()
+			.setEvalContext(container.getEvalContext())
+			.render(wr, ctx);
 	    else
-		elseBlock.newInstance().render(wr, ctx);
+		elseBlock.newInstance()
+			.setEvalContext(container.getEvalContext())
+			.render(wr, ctx);
 	} catch (InstantiationException e) {
 	    throw new RuntimeException(e);
 	} catch (IllegalAccessException e) {

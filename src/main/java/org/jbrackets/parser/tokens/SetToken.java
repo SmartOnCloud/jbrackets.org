@@ -31,7 +31,7 @@ public class SetToken extends BaseToken {
     @Override
     public String getInvocation() {
 	return surroundBySpelParseExceptionCatch(token, "ctx.put(\"" + newVar
-		+ "\", eval(\"" + expr + "\"));\n");
+		+ "\", eval(\"" + expr + "\", ctx));\n");
     }
 
     @Override

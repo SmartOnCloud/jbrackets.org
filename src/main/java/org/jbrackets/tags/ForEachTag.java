@@ -13,10 +13,12 @@ public class ForEachTag extends Tag {
     private int counter = 1;
     private int counter0 = 0;
     private ForEachTag parentloop;
+    private final Block container;
 
     public ForEachTag(Block container) {
 	super(container.getWr(),
 		new HashMap<String, Object>(container.getCtx()));
+	this.container = container;
 	parentloop = (ForEachTag) ctx.get("forloop");
 	ctx.put("forloop", this);
     }
@@ -24,7 +26,7 @@ public class ForEachTag extends Tag {
     public void iterate(String it, String iterationKey,
 	    Class<? extends Block> tmpl) throws ParseException {
 	try {
-	    Object value = Block.eval(iterationKey, ctx);
+	    Object value = container.eval(iterationKey, ctx);
 	    if (value.getClass().isArray())
 		value = Arrays.asList((Object[]) value);
 	    if (value instanceof Map) {
@@ -32,6 +34,7 @@ public class ForEachTag extends Tag {
 	    }
 	    Iterable<?> object = (Iterable<?>) value;
 	    Block newInstance = tmpl.newInstance();
+	    newInstance.setEvalContext(container.getEvalContext());
 	    for (Object obj : object) {
 		ctx.put(it, obj);
 		newInstance.render(wr, this.ctx);
