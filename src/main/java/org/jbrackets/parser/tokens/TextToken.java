@@ -30,7 +30,7 @@ public class TextToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return format("wr.print(\"%s\");\n", getText().toString());
+	return format("wr.print(\"%s\");\n", getText());
     }
 
     @Override

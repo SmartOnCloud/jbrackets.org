@@ -14,11 +14,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 import org.jbrackets.parser.ParseException;
-import org.jbrackets.parser.tokens.MapFailoverAccessor;
 import org.junit.Test;
-import org.springframework.context.expression.BeanFactoryAccessor;
-import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public class TemplateEngineTest {
     TemplateEngine tested = new TemplateEngine();
@@ -26,16 +22,16 @@ public class TemplateEngineTest {
     @Test
     public void testSimple() throws IOException, ParseException,
 	    URISyntaxException {
-	tested.process(getFilePath("/engine/inputOK.txt"), "UTF-8",
-		createEvalContext(), new HashMap<String, Object>());
+	tested.process(getFilePath("/engine/inputOK.txt"),
+		new HashMap<String, Object>());
     }
 
     @Test
     public void testSetToken() throws IOException, ParseException,
 	    URISyntaxException {
 	String process = tested.process(
-		getFilePath("/engine/inputSetTokenExpr.txt"), "UTF-8",
-		createEvalContext(), new HashMap<String, Object>());
+		getFilePath("/engine/inputSetTokenExpr.txt"),
+		new HashMap<String, Object>());
 	assertThat(process, is(equalTo("nested:name2,outer:name")));
     }
 
@@ -43,8 +39,8 @@ public class TemplateEngineTest {
     public void testParseException_Syntax_Javacc() throws IOException,
 	    ParseException, URISyntaxException {
 	try {
-	    tested.process(getFilePath("/engine/inputErrorJavac.txt"), "UTF-8",
-		    createEvalContext(), new HashMap<String, Object>());
+	    tested.process(getFilePath("/engine/inputErrorJavac.txt"),
+		    new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    String expected = "Encountered \" <TAG_EXTENDS> \"{% extends \"\" at line 1, column 2";
@@ -60,7 +56,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputErrorJbracket.txt"),
-		    "UTF-8", createEvalContext(), new HashMap<String, Object>());
+		    new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    BufferedReader m = new BufferedReader(new StringReader(
@@ -81,7 +77,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputExprEvalProblem.txt"),
-		    "UTF-8", createEvalContext(), new HashMap<String, Object>());
+		    new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    BufferedReader m = new BufferedReader(new StringReader(
@@ -97,7 +93,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputExprEvalProblemIf.txt"),
-		    "UTF-8", createEvalContext(), new HashMap<String, Object>());
+		    new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    System.out.println(pe.getMessage());
@@ -114,7 +110,7 @@ public class TemplateEngineTest {
 	    ParseException, URISyntaxException {
 	try {
 	    tested.process(getFilePath("/engine/inputExprEvalProblemFor.txt"),
-		    "UTF-8", createEvalContext(), new HashMap<String, Object>());
+		    new HashMap<String, Object>());
 	    fail();
 	} catch (ParseException pe) {
 	    System.out.println(pe.getMessage());
@@ -130,8 +126,8 @@ public class TemplateEngineTest {
     public void testElvisOperator() throws IOException, ParseException,
 	    URISyntaxException {
 	String process = tested.process(
-		getFilePath("/engine/inputElvisOperator.txt"), "UTF-8",
-		createEvalContext(), new HashMap<String, Object>());
+		getFilePath("/engine/inputElvisOperator.txt"),
+		new HashMap<String, Object>());
 	assertThat(process, is(equalTo("alternative")));
     }
 
@@ -139,13 +135,5 @@ public class TemplateEngineTest {
 	    throws URISyntaxException {
 	URL url = TemplateEngine.class.getResource(fileName);
 	return new File(url.toURI()).getPath();
-    }
-
-    private StandardEvaluationContext createEvalContext() {
-	StandardEvaluationContext context = new StandardEvaluationContext();
-	context.addPropertyAccessor(new ReflectivePropertyAccessor());
-	context.addPropertyAccessor(new BeanFactoryAccessor());
-	context.addPropertyAccessor(new MapFailoverAccessor());
-	return context;
     }
 }
