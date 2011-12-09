@@ -30,7 +30,14 @@ public class TextToken extends BaseToken {
 
     @Override
     public String getInvocation() {
-	return format("wr.print(\"%s\");\n", getText());
+	return format("wr.print(\"%s\");\n", fixEscaped());
+    }
+
+    private String fixEscaped() {
+	return getText().replace("{\\\\%", "{%")
+		.replace("{\\\\#", "{#").replace("%\\\\}", "%}")
+		.replace("#\\\\}", "#}").replace("}\\\\}", "}}")
+		.replace("{\\\\{", "{{");
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,11 @@ public class TemplateEngine {
 	context.addPropertyAccessor(new BeanFactoryAccessor());
 	context.addPropertyAccessor(new MapFailoverAccessor());
 	return context;
+    }
+
+    public String process(String templateFileName) throws ParseException {
+	return process(templateFileName, "UTF-8", createEvalContext(),
+		new HashMap<String, Object>());
     }
 
     public String process(String templateFileName, Map<String, Object> ctx)
@@ -159,6 +165,12 @@ public class TemplateEngine {
 	return e2;
     }
 
+    private ParseException convertException(Exception e) throws ParseException {
+	ParseException e2 = new ParseException(e.getMessage());
+	e2.setStackTrace(e.getStackTrace());
+	return e2;
+    }
+
     @SuppressWarnings("unchecked")
     private static Class<? extends Block> compile(String fileName, String src)
 	    throws ScanException, org.codehaus.janino.Parser.ParseException,
@@ -182,5 +194,31 @@ public class TemplateEngine {
 	// context.registerFunction(name, method)
 	Expression parseExpression = parser.parseExpression(expr);
 	return parseExpression.getValue(context, ctx);
+    }
+
+    public String processString(String template, HashMap<String, Object> ctx)
+	    throws ParseException {
+	try {
+	    TemplateParser parser = new TemplateParser(new StringReader(
+		    template));
+	    TemplateToken tok = parser.process("TEMPLATE");
+	    if (parser.getTemplate().size() > 0) {
+		throw new ParseException(
+			"using {% extends %} and {% include %} tags is not permitted in String templates");
+	    }
+	    Block newInstance = compile("TEMPLATE", tok.getImplementation())
+		    .newInstance();
+
+	    StringWriter stringWriter = new StringWriter();
+	    newInstance.setEvalContext(createEvalContext());
+	    newInstance.render(new PrintWriter(stringWriter), ctx);
+	    stringWriter.flush();
+
+	    return stringWriter.toString();
+	} catch (ParseException e) {
+	    throw e;
+	} catch (Exception e) {
+	    throw convertException(e);
+	}
     }
 }
