@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,24 @@ public class TemplateEngine {
     public TemplateEngine() {
     }
 
+    private StandardEvaluationContext createEvalContext() {
+	StandardEvaluationContext context = new StandardEvaluationContext();
+	context.addPropertyAccessor(new ReflectivePropertyAccessor());
+	context.addPropertyAccessor(new BeanFactoryAccessor());
+	context.addPropertyAccessor(new MapFailoverAccessor());
+	return context;
+    }
+
+    public String process(String templateFileName) throws ParseException {
+	return process(templateFileName, "UTF-8", createEvalContext(),
+		new HashMap<String, Object>());
+    }
+
+    public String process(String templateFileName, Map<String, Object> ctx)
+	    throws ParseException {
+	return process(templateFileName, "UTF-8", createEvalContext(), ctx);
+    }
+
     public String process(String templateFileName, String encoding,
 	    StandardEvaluationContext context, Map<String, Object> ctx)
 	    throws ParseException {
@@ -59,9 +78,8 @@ public class TemplateEngine {
 	String templateName = getClassNameFromTemplateName(templateFile
 		.getName());
 
-	HashSet<String> alreadyProcessed = new HashSet<String>();
 	processTeplate(templateFile, encoding, templateName, s,
-		alreadyProcessed, ctx);
+		new HashSet<String>(), ctx);
 	s.append("// -------------------------------END GENERATED--------------------------------------------------------------------------\n");
 	s.append("// ----------------------------------------------------------------------------------------------------------------------");
 	if (log.isDebugEnabled())
@@ -75,37 +93,28 @@ public class TemplateEngine {
 	    if (log.isDebugEnabled())
 		endCompile = new Date();
 	    StringWriter stringWriter = new StringWriter();
-
 	    newInstance.setEvalContext(context);
-
 	    newInstance.render(new PrintWriter(stringWriter), ctx);
 	    stringWriter.flush();
 	    if (log.isDebugEnabled()) {
-		endExecution = new Date();
-		log.debug("generation [ms]: "
-			+ (startCompile.getTime() - startGen.getTime()));
-		log.debug("compilation[ms]: "
-			+ (endCompile.getTime() - startCompile.getTime()));
-		log.debug("execution  [ms]: "
-			+ (endExecution.getTime() - endCompile.getTime()));
+		logPerformace();
 	    }
 	    return stringWriter.toString();
-	} catch (ClassNotFoundException e) {
+	} catch (ParseException e) {
+	    throw e;
+	} catch (Exception e) {
 	    throw new RuntimeException(e);
-	} catch (CompileException e) {
-	    throw new RuntimeException(e);
-	} catch (InstantiationException e) {
-	    throw new RuntimeException(e);
-	} catch (IllegalAccessException e) {
-	    throw new RuntimeException(e);
-	} catch (IOException e) {
-	    throw new RuntimeException(e);
-	} catch (SpelEvaluationException e) {
-	    ParseException e2 = new ParseException(templateFile.getPath()
-		    + "\n" + e.getMessage());
-	    e2.setStackTrace(e.getStackTrace());
-	    throw e2;
 	}
+    }
+
+    private void logPerformace() {
+	endExecution = new Date();
+	log.debug("generation [ms]: "
+		+ (startCompile.getTime() - startGen.getTime()));
+	log.debug("compilation[ms]: "
+		+ (endCompile.getTime() - startCompile.getTime()));
+	log.debug("execution  [ms]: "
+		+ (endExecution.getTime() - endCompile.getTime()));
     }
 
     private TemplateParser processTeplate(File templateFile, String encoding,
@@ -137,25 +146,28 @@ public class TemplateEngine {
 	    }
 	    return parser;
 	} catch (ParseException e) {
-	    ParseException e2 = new ParseException(templateFile.getPath()
-		    + "\n" + e.getMessage());
-	    e2.setStackTrace(e.getStackTrace());
-	    throw e2;
+	    throw convertException(templateFile, e);
 	} catch (SpelParseException e) {
-	    ParseException e2 = new ParseException(templateFile.getPath()
-		    + "\n" + e.getMessage());
-	    e2.setStackTrace(e.getStackTrace());
-	    throw e2;
+	    throw convertException(templateFile, e);
 	} catch (SpelEvaluationException e) {
-	    ParseException e2 = new ParseException(templateFile.getPath()
-		    + "\n" + e.getMessage());
-	    e2.setStackTrace(e.getStackTrace());
-	    throw e2;
+	    throw convertException(templateFile, e);
 	} catch (FileNotFoundException e) {
-	    ParseException e2 = new ParseException(e.getMessage());
-	    e2.setStackTrace(e.getStackTrace());
-	    throw e2;
+	    throw convertException(templateFile, e);
 	}
+    }
+
+    private ParseException convertException(File templateFile, Exception e)
+	    throws ParseException {
+	ParseException e2 = new ParseException(templateFile.getPath() + "\n"
+		+ e.getMessage());
+	e2.setStackTrace(e.getStackTrace());
+	return e2;
+    }
+
+    private ParseException convertException(Exception e) throws ParseException {
+	ParseException e2 = new ParseException(e.getMessage());
+	e2.setStackTrace(e.getStackTrace());
+	return e2;
     }
 
     @SuppressWarnings("unchecked")
@@ -180,5 +192,31 @@ public class TemplateEngine {
 	// context.registerFunction(name, method)
 	Expression parseExpression = parser.parseExpression(expr);
 	return parseExpression.getValue(context, ctx);
+    }
+
+    public String processString(String template, HashMap<String, Object> ctx)
+	    throws ParseException {
+	try {
+	    TemplateParser parser = new TemplateParser(new StringReader(
+		    template));
+	    TemplateToken tok = parser.process("TEMPLATE");
+	    if (parser.getTemplate().size() > 0) {
+		throw new ParseException(
+			"using {% extends %} and {% include %} tags is not permitted in String templates");
+	    }
+	    Block newInstance = compile("TEMPLATE", tok.getImplementation())
+		    .newInstance();
+
+	    StringWriter stringWriter = new StringWriter();
+	    newInstance.setEvalContext(createEvalContext());
+	    newInstance.render(new PrintWriter(stringWriter), ctx);
+	    stringWriter.flush();
+
+	    return stringWriter.toString();
+	} catch (ParseException e) {
+	    throw e;
+	} catch (Exception e) {
+	    throw convertException(e);
+	}
     }
 }

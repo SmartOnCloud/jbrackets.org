@@ -18,7 +18,7 @@ public class ExpToken extends TextToken {
     @Override
     public String getInvocation() {
 	return surroundBySpelParseExceptionCatch(tok,
-		format("wr.print(eval(\"%s\", ctx));\n", getText().toString()));
+		format("wr.print(eval(\"%s\", ctx));\n", getText()));
     }
 
     public void test() throws ParseException {
