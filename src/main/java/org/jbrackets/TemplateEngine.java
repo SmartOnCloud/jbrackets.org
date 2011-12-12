@@ -25,6 +25,7 @@ import org.jbrackets.parser.tokens.TemplateToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.expression.BeanFactoryAccessor;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelParseException;
@@ -37,14 +38,23 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
  */
 public class TemplateEngine {
 
-    private static Logger log = LoggerFactory.getLogger(TemplateEngine.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private Date startGen;
     private Date startCompile;
     private Date endCompile;
     private Date endExecution;
 
+    private final String encoding;
+
+    private StandardEvaluationContext evalContext;
+
     public TemplateEngine() {
+	this("UTF-8");
+    }
+
+    public TemplateEngine(String encoding) {
+	this.encoding = encoding;
     }
 
     private StandardEvaluationContext createEvalContext() {
@@ -56,17 +66,28 @@ public class TemplateEngine {
     }
 
     public String process(String templateFileName) throws ParseException {
-	return process(templateFileName, "UTF-8", createEvalContext(),
+	return process(templateFileName, encoding, getEvalContext(),
 		new HashMap<String, Object>());
+    }
+
+    public StandardEvaluationContext getEvalContext() {
+	if (evalContext == null) {
+	    evalContext = createEvalContext();
+	}
+	return evalContext;
+    }
+
+    public void setEvalContext(StandardEvaluationContext evalContext) {
+	this.evalContext = evalContext;
     }
 
     public String process(String templateFileName, Map<String, Object> ctx)
 	    throws ParseException {
-	return process(templateFileName, "UTF-8", createEvalContext(), ctx);
+	return process(templateFileName, encoding, getEvalContext(), ctx);
     }
 
     public String process(String templateFileName, String encoding,
-	    StandardEvaluationContext context, Map<String, Object> ctx)
+	    EvaluationContext context, Map<String, Object> ctx)
 	    throws ParseException {
 
 	if (log.isDebugEnabled())
@@ -101,7 +122,12 @@ public class TemplateEngine {
 	    }
 	    return stringWriter.toString();
 	} catch (ParseException e) {
+	    log.error("error", e);
 	    throw e;
+	} catch (SpelParseException e) {
+	    throw convertException(templateFile, e);
+	} catch (SpelEvaluationException e) {
+	    throw convertException(templateFile, e);
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	}
@@ -158,6 +184,7 @@ public class TemplateEngine {
 
     private ParseException convertException(File templateFile, Exception e)
 	    throws ParseException {
+	log.error("error", e);
 	ParseException e2 = new ParseException(templateFile.getPath() + "\n"
 		+ e.getMessage());
 	e2.setStackTrace(e.getStackTrace());
@@ -165,6 +192,7 @@ public class TemplateEngine {
     }
 
     private ParseException convertException(Exception e) throws ParseException {
+	log.error("error", e);
 	ParseException e2 = new ParseException(e.getMessage());
 	e2.setStackTrace(e.getStackTrace());
 	return e2;
@@ -208,7 +236,7 @@ public class TemplateEngine {
 		    .newInstance();
 
 	    StringWriter stringWriter = new StringWriter();
-	    newInstance.setEvalContext(createEvalContext());
+	    newInstance.setEvalContext(getEvalContext());
 	    newInstance.render(new PrintWriter(stringWriter), ctx);
 	    stringWriter.flush();
 
