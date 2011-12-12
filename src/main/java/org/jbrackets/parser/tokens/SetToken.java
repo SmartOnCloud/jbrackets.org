@@ -16,10 +16,12 @@ public class SetToken extends BaseToken {
     }
 
     public void setParam(String param) {
-	String[] split = param.split(" ");
-	newVar = replaceChars(split[0]);
-	expr = replaceChars(split[1]);
-
+	// TODO improve parsing
+	int split_index = param.indexOf(" ");
+	if (split_index==-1)
+	    split_index = param.indexOf("\n");
+	newVar = replaceChars(param.substring(0, split_index));
+	expr = replaceChars(param.substring(split_index).replace("\n", ""));
 	if (log.isDebugEnabled())
 	    log.debug("set '" + newVar + "': [" + expr + "]");
     }
