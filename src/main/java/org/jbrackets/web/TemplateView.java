@@ -62,7 +62,7 @@ public class TemplateView extends InternalResourceView {
 	    HttpServletRequest request, HttpServletResponse response,
 	    ParseException e) throws IOException, ParseException,
 	    URISyntaxException {
-	URL resource = getClass().getResource("/error/error_message.html");
+	URL resource = getClass().getResource("/jbrackets_templates/error_message.html");
 	StringWriter trace = new StringWriter();
 	PrintWriter s = new PrintWriter(trace);
 	e.printStackTrace(s);
