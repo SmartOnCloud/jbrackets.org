@@ -5,23 +5,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jbrackets.parser.ParseException;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public abstract class Block {
 
     protected PrintWriter wr;
     protected Map<String, Object> ctx;
 
-    protected StandardEvaluationContext evalContext;
+    protected EvaluationContext evalContext;
 
-    public Block setEvalContext(StandardEvaluationContext evalContext) {
+    public Block setEvalContext(EvaluationContext evalContext) {
 	this.evalContext = evalContext;
 	return this;
     }
 
-    public StandardEvaluationContext getEvalContext() {
+    public EvaluationContext getEvalContext() {
 	return evalContext;
     }
 

@@ -15,11 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jbrackets.TemplateEngine;
 import org.jbrackets.parser.ParseException;
-import org.jbrackets.parser.tokens.MapFailoverAccessor;
-import org.springframework.context.expression.BeanFactoryAccessor;
-import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.web.servlet.view.InternalResourceView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.web.servlet.view.AbstractTemplateView;
 
 /**
  * USAGE:
@@ -33,24 +35,68 @@ import org.springframework.web.servlet.view.InternalResourceView;
  * </pre>
  */
 
-public class TemplateView extends InternalResourceView {
-    private TemplateEngine templateEngine = new TemplateEngine();
+public class TemplateView extends AbstractTemplateView {
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private StandardEvaluationContext createEvalContext() {
-	StandardEvaluationContext context = new StandardEvaluationContext();
-	context.addPropertyAccessor(new ReflectivePropertyAccessor());
-	context.addPropertyAccessor(new BeanFactoryAccessor());
-	context.addPropertyAccessor(new MapFailoverAccessor());
-	return context;
+    private TemplateEngine templateEngine;
+    private EvaluationContext evalContext;
+
+    /**
+     * Invoked on startup. Looks for a single VelocityConfig bean to find the
+     * relevant VelocityEngine for this factory.
+     */
+    @Override
+    protected void initApplicationContext() throws BeansException {
+	super.initApplicationContext();
+
+	if (getTemplateEngine() == null) {
+	    setTemplateEngine(autodetectTemplateEngine());
+	}
     }
 
-    protected void renderMergedOutputModel(Map<String, Object> model,
+    public void setEvalContext(EvaluationContext evalContext) {
+	this.evalContext = evalContext;
+    }
+
+    public TemplateEngine getTemplateEngine() {
+	return templateEngine;
+    }
+
+    public void setTemplateEngine(TemplateEngine templateEngine) {
+	this.templateEngine = templateEngine;
+    }
+
+    /**
+     * Autodetect a TemplateEngine via the ApplicationContext. Called if no
+     * explicit TemplateEngine has been specified.
+     * 
+     * @return the TemplateEngine to use for VelocityViews
+     * @see #getApplicationContext
+     * @see #setTemplateEngine
+     */
+    protected TemplateEngine autodetectTemplateEngine() throws BeansException {
+	try {
+	    JBracketsConfig jBracketsConfig = BeanFactoryUtils
+		    .beanOfTypeIncludingAncestors(getApplicationContext(),
+			    JBracketsConfig.class, true, false);
+	    log.info("using provided jBracketConfig.");
+	    setEvalContext(jBracketsConfig.getEvaluationContext());
+	    return jBracketsConfig.getTemplateEngine();
+	} catch (NoSuchBeanDefinitionException ex) {
+	    JBracketsConfig jBracketsConfig = new JBracketsConfig();
+	    jBracketsConfig.afterPropertiesSet();
+	    setEvalContext(jBracketsConfig.getEvaluationContext());
+	    log.info("using default jBracketConfig.");
+	    return jBracketsConfig.getTemplateEngine();
+	}
+    }
+
+    protected void renderMergedTemplateModel(Map<String, Object> model,
 	    HttpServletRequest request, HttpServletResponse response)
 	    throws Exception {
 	String templateFile = getServletContext().getRealPath(getUrl());
 	try {
-	    String process = templateEngine.process(templateFile, "UTF-8",
-		    createEvalContext(), model);
+	    String process = templateEngine.process(templateFile, model);
 	    response.setContentType(getContentType());
 	    response.getWriter().print(process);
 	} catch (ParseException e) {
@@ -62,7 +108,8 @@ public class TemplateView extends InternalResourceView {
 	    HttpServletRequest request, HttpServletResponse response,
 	    ParseException e) throws IOException, ParseException,
 	    URISyntaxException {
-	URL resource = getClass().getResource("/jbrackets_templates/error_message.html");
+	URL resource = getClass().getResource(
+		"/jbrackets_templates/error_message.html");
 	StringWriter trace = new StringWriter();
 	PrintWriter s = new PrintWriter(trace);
 	e.printStackTrace(s);
@@ -78,6 +125,7 @@ public class TemplateView extends InternalResourceView {
 	response.setContentType(getContentType());
 	response.getWriter().print(
 		templateEngine.process(new File(resource.toURI()).getPath(),
-			"UTF-8", createEvalContext(), model));
+			"UTF-8", evalContext, model));
     }
+
 }
