@@ -18,18 +18,15 @@ public class TemplateToken extends BaseToken {
 	    log.debug("teamplate name:[" + templateName + "]");
     }
 
-    public String getTemplateName() {
-	return templateName;
-    }
-
     public String getTemplateClassName() {
 	return getClassNameFromTemplateName(templateName);
     }
 
     public static String getClassNameFromTemplateName(String templateName) {
-	return templateName.replace("../", "up_").replace("/", "_")
-		.replace("'", "").replace("\"", "").replace(".", "_")
-		.replace("-", "_").toUpperCase();
+	return "VIEW_"
+		+ templateName.replace("../", "up_").replace("/", "_")
+			.replace("'", "").replace("\"", "").replace(".", "_")
+			.replace("-", "_").toUpperCase();
     }
 
     @Override
