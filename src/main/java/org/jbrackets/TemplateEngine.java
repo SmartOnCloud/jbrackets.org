@@ -97,8 +97,7 @@ public class TemplateEngine {
 	s.append("// ----------------------------------------------------------------------------------------------------------------------\n");
 	s.append("// -----------------------------------GENERATED--------------------------------------------------------------------------\n");
 	File templateFile = new File(templateFileName);
-	String templateName = getClassNameFromTemplateName(templateFile
-		.getName());
+	String templateName = (templateFile.getName());
 
 	processTeplate(templateFile, encoding, templateName, s,
 		new HashSet<String>(), ctx);
@@ -161,7 +160,7 @@ public class TemplateEngine {
 	    for (String template : templates) {
 		template = String.valueOf(eval(template, ctx)).trim();
 		File file = new File(templateFile.getParent() + "/" + template);
-		String templateClassToGenerate = getClassNameFromTemplateName(template);
+		String templateClassToGenerate = (template);
 		if (!alreadyProcessed.contains(templateClassToGenerate)) {
 		    parser = processTeplate(file, encoding,
 			    templateClassToGenerate, s, alreadyProcessed, ctx);
@@ -207,7 +206,7 @@ public class TemplateEngine {
 		new StringReader(src));
 	ClassLoader classLoader = simpleCompiler.getClassLoader();
 	Class<? extends Block> loadClass = (Class<? extends Block>) classLoader
-		.loadClass(fileName);
+		.loadClass(TemplateToken.getClassNameFromTemplateName(fileName));
 	return loadClass;
     }
 

@@ -1,5 +1,6 @@
 package org.jbrackets.parser.tokens;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jbrackets.parser.Token;
 import org.jbrackets.tags.IfTag;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class IfToken extends BaseToken {
     public void setParam(String param) {
 	if (log.isDebugEnabled())
 	    log.debug("expr:[" + param + "]");
-	expr = param;
+	expr = StringEscapeUtils.escapeJava(param);
     }
 
     @Override

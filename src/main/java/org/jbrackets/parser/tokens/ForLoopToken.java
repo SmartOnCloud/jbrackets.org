@@ -1,5 +1,6 @@
 package org.jbrackets.parser.tokens;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jbrackets.parser.ParseException;
 import org.jbrackets.parser.Token;
 import org.jbrackets.tags.ForEachTag;
@@ -25,7 +26,7 @@ public class ForLoopToken extends BaseToken {
 	if (split.length != 2)
 	    throw new ParseException("expected: \"for it in iterable\" format.");
 	it = split[0];
-	col = split[1];
+	col = StringEscapeUtils.escapeJava(split[1]);
 	if (log.isDebugEnabled())
 	    log.debug("found two arguments:[" + it + "," + col + "]");
     }
