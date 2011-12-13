@@ -17,10 +17,9 @@ public class DefaultRegistrar implements StandardEvaluationContextRegistrat {
 	c.addPropertyAccessor(new MapFailoverAccessor());
 
 	try {
-	    c.registerFunction(
-		    "date",
-		    JBracketsFunctions.class.getMethod("date", new Class<?>[] {
-			    Date.class, String.class }));
+	    if (c.lookupVariable("date") == null)
+		c.registerFunction("date", JBracketsFunctions.class.getMethod(
+			"date", new Class<?>[] { Date.class, String.class }));
 	    c.registerFunction("escapeHtml", StringEscapeUtils.class.getMethod(
 		    "escapeHtml", new Class<?>[] { String.class }));
 
