@@ -27,10 +27,9 @@ import org.springframework.web.servlet.view.AbstractTemplateView;
  * USAGE:
  * 
  * <pre>
- * <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+ * <bean class="org.jbrackets.web.JBracketsViewResolver">
  *   <property name="prefix" value="/WEB-INF/views/" />
  *   <property name="suffix" value=".html" />
- *   <property name="viewClass" value="org.jbrackets.web.TemplateView" />
  * </bean>
  * </pre>
  */
