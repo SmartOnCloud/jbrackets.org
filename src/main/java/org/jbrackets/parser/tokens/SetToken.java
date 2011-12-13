@@ -1,12 +1,18 @@
 package org.jbrackets.parser.tokens;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jbrackets.parser.ParseException;
 import org.jbrackets.parser.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SetToken extends BaseToken {
+    private static final String PARAM_PATTERN = "(?s)([^ \n\t]+)[ \n\t]+(.+)$";
     private static Logger log = LoggerFactory.getLogger(SetToken.class);
+
     private String newVar;
     private String expr;
     private Token token;
@@ -15,13 +21,16 @@ public class SetToken extends BaseToken {
 	this.token = token;
     }
 
-    public void setParam(String param) {
-	// TODO improve parsing
-	int split_index = param.indexOf(" ");
-	if (split_index==-1)
-	    split_index = param.indexOf("\n");
-	newVar = replaceChars(param.substring(0, split_index));
-	expr = replaceChars(param.substring(split_index).replace("\n", ""));
+    public void setParam(String param) throws ParseException {
+	Pattern pattern = Pattern.compile(PARAM_PATTERN);
+	Matcher m = pattern.matcher(param);
+	if (!m.matches())
+	    throw new ParseException("missing expression in:" + param
+		    + " line " + token.beginLine + ", column "
+		    + token.beginColumn);
+
+	newVar = replaceChars(m.group(1));
+	expr = replaceChars(m.group(2));
 	if (log.isDebugEnabled())
 	    log.debug("set '" + newVar + "': [" + expr + "]");
     }

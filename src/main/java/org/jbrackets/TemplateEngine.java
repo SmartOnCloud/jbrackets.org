@@ -211,17 +211,10 @@ public class TemplateEngine {
 	return loadClass;
     }
 
-    public Object eval(String expr, Object ctx) throws ParseException {
-	StandardEvaluationContext context = new StandardEvaluationContext();
+    private Object eval(String expr, Object ctx) throws ParseException {
 	SpelExpressionParser parser = new SpelExpressionParser();
-	context.addPropertyAccessor(new ReflectivePropertyAccessor());
-	context.addPropertyAccessor(new BeanFactoryAccessor());
-	context.addPropertyAccessor(new MapFailoverAccessor());
-	// TODO add BeanResolver to have access to ctx beans
-	// TODO register functions, i.e. date formating
-	// context.registerFunction(name, method)
 	Expression parseExpression = parser.parseExpression(expr);
-	return parseExpression.getValue(context, ctx);
+	return parseExpression.getValue(getEvalContext(), ctx);
     }
 
     public String processString(String template, HashMap<String, Object> ctx)
