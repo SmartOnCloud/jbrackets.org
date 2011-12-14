@@ -1,11 +1,11 @@
 package org.jbrackets;
 
-import static org.jbrackets.parser.tokens.TemplateToken.getClassNameFromTemplateName;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -214,7 +214,7 @@ public class TemplateEngine {
 	return parseExpression.getValue(getEvalContext(), ctx);
     }
 
-    public String processString(String template, HashMap<String, Object> ctx)
+    public String processString(String template, Map<String, Object> ctx)
 	    throws ParseException {
 	try {
 	    TemplateParser parser = new TemplateParser(new StringReader(
@@ -223,6 +223,32 @@ public class TemplateEngine {
 	    if (parser.getTemplate().size() > 0) {
 		throw new ParseException(
 			"using {% extends %} and {% include %} tags is not permitted in String templates");
+	    }
+	    Block newInstance = compile("TEMPLATE", tok.getImplementation())
+		    .newInstance();
+
+	    StringWriter stringWriter = new StringWriter();
+	    newInstance.setEvalContext(getEvalContext());
+	    newInstance.render(new PrintWriter(stringWriter), ctx);
+	    stringWriter.flush();
+
+	    return stringWriter.toString();
+	} catch (ParseException e) {
+	    throw e;
+	} catch (Exception e) {
+	    throw convertException(e);
+	}
+    }
+
+    public String processStream(InputStream stream, Map<String, Object> ctx)
+	    throws ParseException {
+	try {
+	    TemplateParser parser = new TemplateParser(new InputStreamReader(
+		    stream));
+	    TemplateToken tok = parser.process("TEMPLATE");
+	    if (parser.getTemplate().size() > 0) {
+		throw new ParseException(
+			"using {% extends %} and {% include %} tags is not permitted in Stream templates");
 	    }
 	    Block newInstance = compile("TEMPLATE", tok.getImplementation())
 		    .newInstance();
