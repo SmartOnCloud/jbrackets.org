@@ -2,12 +2,11 @@ package org.jbrackets.web;
 
 import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.expression.EvaluationContext;
 import org.springframework.web.servlet.view.AbstractTemplateView;
 
 /**
@@ -38,7 +36,6 @@ public class TemplateView extends AbstractTemplateView {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private TemplateEngine templateEngine;
-    private EvaluationContext evalContext;
 
     /**
      * Invoked on startup. Looks for a single VelocityConfig bean to find the
@@ -51,10 +48,6 @@ public class TemplateView extends AbstractTemplateView {
 	if (getTemplateEngine() == null) {
 	    setTemplateEngine(autodetectTemplateEngine());
 	}
-    }
-
-    public void setEvalContext(EvaluationContext evalContext) {
-	this.evalContext = evalContext;
     }
 
     public TemplateEngine getTemplateEngine() {
@@ -79,12 +72,10 @@ public class TemplateView extends AbstractTemplateView {
 		    .beanOfTypeIncludingAncestors(getApplicationContext(),
 			    JBracketsConfig.class, true, false);
 	    log.info("using provided jBracketConfig.");
-	    setEvalContext(jBracketsConfig.getEvaluationContext());
 	    return jBracketsConfig.getTemplateEngine();
 	} catch (NoSuchBeanDefinitionException ex) {
 	    JBracketsConfig jBracketsConfig = new JBracketsConfig();
 	    jBracketsConfig.afterPropertiesSet();
-	    setEvalContext(jBracketsConfig.getEvaluationContext());
 	    log.info("using default jBracketConfig.");
 	    return jBracketsConfig.getTemplateEngine();
 	}
@@ -107,8 +98,6 @@ public class TemplateView extends AbstractTemplateView {
 	    HttpServletRequest request, HttpServletResponse response,
 	    ParseException e) throws IOException, ParseException,
 	    URISyntaxException {
-	URL resource = getClass().getResource(
-		"/jbrackets_templates/error_message.html");
 	StringWriter trace = new StringWriter();
 	PrintWriter s = new PrintWriter(trace);
 	e.printStackTrace(s);
@@ -122,9 +111,10 @@ public class TemplateView extends AbstractTemplateView {
 	model.put("ex_message", escapeHtml(e.getMessage()));
 
 	response.setContentType(getContentType());
-	response.getWriter().print(
-		templateEngine.process(new File(resource.toURI()).getPath(),
-			"UTF-8", evalContext, model));
+	InputStream stream = getClass().getResourceAsStream(
+		"/jbrackets_templates/error_message.html");
+	response.getWriter().print(templateEngine.processStream(stream, model));
+	stream.close();
     }
 
 }
