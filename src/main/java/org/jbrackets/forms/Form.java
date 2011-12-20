@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 
 /**
  * @author michal.jemala
@@ -19,27 +21,33 @@ public class Form {
     }
 
     protected String as_item(ItemWrapper w) {
+	return as_item(getFieldsMetadata(), w);
+    }
+
+    protected String as_item(List<FieldMetadata> fieldMetadata, ItemWrapper w) {
 	StringBuilder sb = new StringBuilder();
 
-	for (FieldMetadata fd : getFieldsMetadata()) {
-	    if (fd.isValid()) {
-		Field field = fd.getField();
-		Annotation annotation = fd.getAnnotation();
-		Renderer renderer = instatiateRenderer(fd);
+	for (FieldMetadata fm : fieldMetadata) {
+	    if (fm.isValid()) {
+		Field field = fm.getField();
+		Annotation annotation = fm.getAnnotation();
+		Renderer renderer = instatiateRenderer(fm);
+		FieldError fieldError = errors != null ? errors
+			.getFieldError(field.getName()) : null;
+		fm.setError(fieldError);
 
-		sb.append(w.beforeItem(fd));
+		sb.append(w.beforeItem(fm));
 
-		sb.append(w.beforeItemLabel(fd));
+		sb.append(w.beforeItemLabel(fm));
 		sb.append(renderer.renderLabel(this, annotation, field,
-			errors != null ? errors.getFieldError(field.getName())
-				: null));
-		sb.append(w.afterItemLabel(fd));
+			fieldError));
+		sb.append(w.afterItemLabel(fm));
 
-		sb.append(w.beforeItemField(fd));
+		sb.append(w.beforeItemField(fm));
 		sb.append(renderer.renderField(this, annotation, field));
-		sb.append(w.afterItemField(fd));
+		sb.append(w.afterItemField(fm));
 
-		sb.append(w.afterItem(fd));
+		sb.append(w.afterItem(fm));
 	    }
 	}
 
@@ -47,10 +55,12 @@ public class Form {
     }
 
     public String as_table() {
-	return as_item(new DefaultItemWrapper() {
+	List<FieldMetadata> fields = getFieldsMetadata();
+
+	return as_item(fields, new DefaultItemWrapper() {
 	    @Override
 	    public String beforeItem(FieldMetadata metadata) {
-		return "<tr>";
+		return metadata.hasError() ? "<tr class='error'>" : "<tr>";
 	    }
 
 	    @Override
@@ -75,35 +85,64 @@ public class Form {
 
 	    @Override
 	    public String afterItemField(FieldMetadata metadata) {
-		return "</td>";
+		if (metadata.hasError()) {
+		    return "<span>" + metadata.getError().getDefaultMessage()
+			    + "</span></td>";
+		} else {
+		    return "</td>";
+		}
 	    }
 	});
     }
 
     public String as_p() {
-	return as_item(new DefaultItemWrapper() {
+	List<FieldMetadata> fields = getFieldsMetadata();
+
+	return as_item(fields, new DefaultItemWrapper() {
 	    @Override
 	    public String beforeItem(FieldMetadata metadata) {
-		return "<p>";
+		return metadata.hasError() ? "<p class='error'>" : "<p>";
 	    }
 
 	    @Override
 	    public String afterItem(FieldMetadata metadata) {
 		return "</p>";
 	    }
+
+	    @Override
+	    public String afterItemField(FieldMetadata metadata) {
+		if (metadata.hasError()) {
+		    return "<span>" + metadata.getError().getDefaultMessage()
+			    + "</span>";
+		} else {
+		    return "";
+		}
+	    }
 	});
     }
 
     public String as_li() {
-	return as_item(new DefaultItemWrapper() {
+	List<FieldMetadata> fields = getFieldsMetadata();
+
+	return as_item(fields, new DefaultItemWrapper() {
 	    @Override
 	    public String beforeItem(FieldMetadata metadata) {
-		return "<li>";
+		return metadata.hasError() ? "<li class='error'>" : "<li>";
 	    }
 
 	    @Override
 	    public String afterItem(FieldMetadata metadata) {
 		return "</li>";
+	    }
+
+	    @Override
+	    public String afterItemField(FieldMetadata metadata) {
+		if (metadata.hasError()) {
+		    return "<span>" + metadata.getError().getDefaultMessage()
+			    + "</span>";
+		} else {
+		    return "";
+		}
 	    }
 	});
     }
@@ -119,31 +158,36 @@ public class Form {
 	    ReflectionUtils.makeAccessible(constructor);
 	    renderer = constructor.newInstance();
 	} catch (Exception e) {
-	    // TODO add logging
+	    e.printStackTrace();
 	}
 
 	return renderer;
     }
 
     protected List<FieldMetadata> getFieldsMetadata() {
-	List<FieldMetadata> fieldDefinitions = new ArrayList<FieldMetadata>();
+	final List<FieldMetadata> fieldMetadata = new ArrayList<FieldMetadata>();
 
-	for (Field field : getClass().getDeclaredFields()) {
-	    Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
-	    for (Annotation annotation : declaredAnnotations) {
-		FormField markerAnnotation = annotation.annotationType()
-			.getAnnotation(FormField.class);
-		if (markerAnnotation != null) {
-		    Class<? extends Renderer> renderer = markerAnnotation
-			    .renderer();
-		    FieldMetadata fieldDefinition = new FieldMetadata(field,
-			    annotation, renderer);
-		    fieldDefinitions.add(fieldDefinition);
+	ReflectionUtils.doWithFields(getClass(), new FieldCallback() {
+	    @Override
+	    public void doWith(Field field) throws IllegalArgumentException,
+		    IllegalAccessException {
+		Annotation[] declaredAnnotations = field
+			.getDeclaredAnnotations();
+		for (Annotation annotation : declaredAnnotations) {
+		    FormField markerAnnotation = annotation.annotationType()
+			    .getAnnotation(FormField.class);
+		    if (markerAnnotation != null) {
+			Class<? extends Renderer> renderer = markerAnnotation
+				.renderer();
+			FieldMetadata fieldDefinition = new FieldMetadata(
+				field, annotation, renderer);
+			fieldMetadata.add(fieldDefinition);
+		    }
 		}
 	    }
-	}
+	});
 
-	return fieldDefinitions;
+	return fieldMetadata;
     }
 
     public Form withErrors(Errors errors) {
