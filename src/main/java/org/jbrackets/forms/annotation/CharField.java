@@ -1,4 +1,6 @@
-package org.jbrackets.forms;
+package org.jbrackets.forms.annotation;
+
+import static org.jbrackets.forms.Widget.INPUTTEXT;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -6,14 +8,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.jbrackets.forms.Widget;
+import org.jbrackets.forms.renderer.InputTextRenderer;
+
 /**
- * @author michal.jemala
+ * @deprecated use {@link InputField} instead
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@FormField(renderer = OptionListRenderer.class)
-public @interface ChoiceField {
+@FormField(renderer = InputTextRenderer.class)
+@Deprecated
+public @interface CharField {
 
     String name() default "";
 
@@ -23,8 +29,6 @@ public @interface ChoiceField {
 
     boolean hidden() default false;
 
-    /**
-     * Option is selected if: option.toString() == fieldValue.toString()
-     */
-    Class<? extends OptionProvider> options();
+    Widget widget() default INPUTTEXT;
+
 }

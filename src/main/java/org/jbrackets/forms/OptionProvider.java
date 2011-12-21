@@ -7,12 +7,4 @@ import java.util.List;
  */
 public interface OptionProvider {
     List<? extends Option> getOptions();
-
-    interface Option {
-	String value();
-
-	String label();
-
-	boolean standsFor(Object object);
-    }
 }

@@ -3,6 +3,7 @@ package org.jbrackets.forms;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
+import org.jbrackets.forms.renderer.Renderer;
 import org.springframework.validation.FieldError;
 
 /**

@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbrackets.forms.annotation.FormField;
+import org.jbrackets.forms.renderer.Renderer;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 import org.springframework.validation.Errors;
@@ -39,12 +41,11 @@ public class Form {
 		sb.append(w.beforeItem(fm));
 
 		sb.append(w.beforeItemLabel(fm));
-		sb.append(renderer.renderLabel(this, annotation, field,
-			fieldError));
+		sb.append(renderer.renderLabel(this, fm));
 		sb.append(w.afterItemLabel(fm));
 
 		sb.append(w.beforeItemField(fm));
-		sb.append(renderer.renderField(this, annotation, field));
+		sb.append(renderer.renderField(this, fm));
 		sb.append(w.afterItemField(fm));
 
 		sb.append(w.afterItem(fm));
